@@ -1,6 +1,8 @@
-﻿using Firebase;
+﻿using Carrot;
+using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
+using System.Collections;
 using UnityEngine;
 
 public class App : MonoBehaviour
@@ -40,27 +42,32 @@ public class App : MonoBehaviour
 
         if (args.Snapshot.Exists)
         {
-            foreach (var userSnapshot in args.Snapshot.Children)
+            foreach (var dateSnapshot in args.Snapshot.Children)
             {
-                string userId = userSnapshot.Key;
-                string userName = userSnapshot.Child(userId).Value.ToString();
-                Debug.Log("User ID: " + userId+" Monney:"+userName);
-
-                if (userSnapshot.HasChild("children"))
+                string dateKey = dateSnapshot.Key; 
+ 
+                foreach (var moneySnapshot in dateSnapshot.Children)
                 {
-                    DataSnapshot childrenSnapshot = userSnapshot.Child("children");
-                    foreach (var childSnapshot in childrenSnapshot.Children)
+                    string moneyKey = moneySnapshot.Key;
+                    string moneyValue = moneySnapshot.Value.ToString();
+
+                    GameObject obj_bill = Instantiate(this.prefab_item_bill);
+                    obj_bill.transform.SetParent(this.tr_all_item);
+                    obj_bill.transform.localPosition = Vector3.zero;
+                    obj_bill.transform.localScale = new Vector3(1f, 1f, 1f);
+                    Bill_Item bill = obj_bill.GetComponent<Bill_Item>();
+
+                    if (moneySnapshot.HasChild("username"))
                     {
-                        Debug.Log(childSnapshot.GetRawJsonValue());
-                        GameObject obj_bill = Instantiate(this.prefab_item_bill);
-                        obj_bill.transform.SetParent(this.tr_all_item);
-                        obj_bill.transform.localPosition = Vector3.zero;
-                        obj_bill.transform.localScale = new Vector3(1f, 1f, 1f);
-                        obj_bill.GetComponent<Bill_Item>().txt_name.text = childSnapshot.GetRawJsonValue();
+                        bill.txt_name.text = moneySnapshot.Child("username").Value.ToString();
+                    }
+
+                    if (moneySnapshot.HasChild("money"))
+                    {
+                        bill.txt_tip.text = moneySnapshot.Child("money").Value.ToString();
                     }
                 }
             }
-
         }
         else
         {
