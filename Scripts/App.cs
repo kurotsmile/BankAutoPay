@@ -40,15 +40,27 @@ public class App : MonoBehaviour
 
         if (args.Snapshot.Exists)
         {
-            foreach (var childSnapshot in args.Snapshot.Children)
+            foreach (var userSnapshot in args.Snapshot.Children)
             {
-                GameObject obj_bill = Instantiate(this.prefab_item_bill);
-                obj_bill.transform.SetParent(this.tr_all_item);
-                obj_bill.transform.localPosition = Vector3.zero;
-                obj_bill.transform.localScale = new Vector3(1f, 1f, 1f);
+                string userId = userSnapshot.Key;
+                string userName = userSnapshot.Child(userId).Value.ToString();
+                Debug.Log("User ID: " + userId+" Monney:"+userName);
 
-                obj_bill.GetComponent<Bill_Item>();
+                if (userSnapshot.HasChild("children"))
+                {
+                    DataSnapshot childrenSnapshot = userSnapshot.Child("children");
+                    foreach (var childSnapshot in childrenSnapshot.Children)
+                    {
+                        Debug.Log(childSnapshot.GetRawJsonValue());
+                        GameObject obj_bill = Instantiate(this.prefab_item_bill);
+                        obj_bill.transform.SetParent(this.tr_all_item);
+                        obj_bill.transform.localPosition = Vector3.zero;
+                        obj_bill.transform.localScale = new Vector3(1f, 1f, 1f);
+                        obj_bill.GetComponent<Bill_Item>().txt_name.text = childSnapshot.GetRawJsonValue();
+                    }
+                }
             }
+
         }
         else
         {
