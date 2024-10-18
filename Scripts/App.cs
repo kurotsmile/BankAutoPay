@@ -1,8 +1,6 @@
-﻿using Carrot;
-using Firebase;
+﻿using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
-using System.Collections;
 using UnityEngine;
 
 public class App : MonoBehaviour
@@ -13,15 +11,29 @@ public class App : MonoBehaviour
 
     void Start()
     {
+        if (PlayerPrefs.GetInt("is_ready_config_db", 0) == 0) 
+            this.LoadFirebaseConfig();
+        else
+        {
+            databaseRef = FirebaseDatabase.DefaultInstance.RootReference;
+            this.ReadDataFromFirebase();
+        }
+            
+    }
+
+    void LoadFirebaseConfig()
+    {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
-            if (task.Result == DependencyStatus.Available)
+            Firebase.DependencyStatus status = task.Result;
+            if (status == Firebase.DependencyStatus.Available)
             {
                 databaseRef = FirebaseDatabase.DefaultInstance.RootReference;
-                ReadDataFromFirebase();
+                PlayerPrefs.SetInt("is_ready_config_db", 1);
+                this.ReadDataFromFirebase();
             }
             else
             {
-                Debug.LogError("Không thể khởi tạo Firebase: " + task.Result);
+                Debug.LogError($"Could not resolve all Firebase dependencies: {status}");
             }
         });
     }
@@ -42,6 +54,7 @@ public class App : MonoBehaviour
 
         if (args.Snapshot.Exists)
         {
+            this.Clear_contain(this.tr_all_item);
             foreach (var dateSnapshot in args.Snapshot.Children)
             {
                 string dateKey = dateSnapshot.Key; 
@@ -79,5 +92,13 @@ public class App : MonoBehaviour
     public void Quit_App()
     {
         Application.Quit();
+    }
+
+    public void Clear_contain(Transform tr)
+    {
+        foreach(Transform child in tr)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }
