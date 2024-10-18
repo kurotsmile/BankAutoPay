@@ -1,13 +1,13 @@
 ﻿using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class App : MonoBehaviour
 {
+    public GameObject prefab_item_bill;
     private DatabaseReference databaseRef;
+    public Transform tr_all_item;
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class App : MonoBehaviour
 
     void ReadDataFromFirebase()
     {
-        DatabaseReference usersRef = databaseRef.Child("users");
+        DatabaseReference usersRef = databaseRef.Child("lich_su_nap_rut");
         usersRef.ValueChanged += HandleValueChanged;
     }
 
@@ -42,8 +42,12 @@ public class App : MonoBehaviour
         {
             foreach (var childSnapshot in args.Snapshot.Children)
             {
-                Debug.Log("User ID: " + childSnapshot.Key);
-                Debug.Log("User Data: " + childSnapshot.GetRawJsonValue());
+                GameObject obj_bill = Instantiate(this.prefab_item_bill);
+                obj_bill.transform.SetParent(this.tr_all_item);
+                obj_bill.transform.localPosition = Vector3.zero;
+                obj_bill.transform.localScale = new Vector3(1f, 1f, 1f);
+
+                obj_bill.GetComponent<Bill_Item>();
             }
         }
         else
