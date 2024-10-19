@@ -25,6 +25,12 @@ public class App : MonoBehaviour
     private int index_sel_bank;
     void Start()
     {
+        //this.load_config_app();
+        this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
+        this.Update_ui_list_bank();
+    }
+
+    public void load_config_app(){
         // Tạo cấu hình Firebase tuỳ chỉnh
         AppOptions options = new AppOptions
         {
@@ -36,7 +42,7 @@ public class App : MonoBehaviour
         };
 
         if(customApp==null){
-            Debug.Log("App chua duoc khoi tao!");
+            this.txt_status_app.text="Start software initialization and server connection...";
             // Khởi tạo ứng dụng Firebase với cấu hình tuỳ chỉnh
             customApp = FirebaseApp.Create(options, "customApp_bank");
 
@@ -58,10 +64,6 @@ public class App : MonoBehaviour
         else{
             Debug.Log("App da duoc tao!");
         } 
-
-
-        this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
-        this.Update_ui_list_bank();
     }
 
     void ReadDataFromFirebase()
@@ -102,7 +104,6 @@ public class App : MonoBehaviour
 
                     bill.Set_Act_Click(() =>
                     {
-                        //this.RunMirFileWithMemu();
                         this.RunCommandWithMemu("start");
                     });
                 }
@@ -114,9 +115,14 @@ public class App : MonoBehaviour
         }
     }
 
+    void OnDisable() {
+        databaseRef.ValueChanged -= HandleValueChanged;
+        FirebaseDatabase.DefaultInstance.GoOffline();
+    }
 
     public void Quit_App()
     {
+        this.OnDisable();
         Application.Quit();
     }
 
@@ -139,7 +145,7 @@ public class App : MonoBehaviour
 
         System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
         processInfo.FileName = memuPath; 
-        processInfo.Arguments = "MEmuc -i 0 "+s_command; 
+        processInfo.Arguments = "\"MEmuc -i 0 " + s_command + "\"";
 
         System.Diagnostics.Process.Start(processInfo);
         UnityEngine.Debug.Log("Running CMD with MEmu: " + s_command);

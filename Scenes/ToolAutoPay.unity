@@ -2027,7 +2027,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1667508230}
         m_TargetAssemblyTypeName: App, Assembly-CSharp
-        m_MethodName: Btn_start_Memu
+        m_MethodName: load_config_app
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2282,6 +2282,7 @@ MonoBehaviour:
   color_sel:
     serializedVersion: 2
     rgba: 4278209200
+  adb: {fileID: 1667508231}
   tr_all_item: {fileID: 1753495666}
   txt_status_app: {fileID: 486109017}
   bank_items:
@@ -2300,6 +2301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bec71fdac3a6801428ac3de090b847a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  list_command: []
 --- !u!1 &1753495665
 GameObject:
   m_ObjectHideFlags: 0
