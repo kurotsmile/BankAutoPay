@@ -11,6 +11,7 @@ public class App : MonoBehaviour
     public GameObject prefab_item_bill;
     public Color32 color_nomal;
     public Color32 color_sel;
+    public ADB_Control adb;
 
     [Header("UI")]
     public Transform tr_all_item;
@@ -34,23 +35,30 @@ public class App : MonoBehaviour
             StorageBucket = "clbank.appspot.com"
         };
 
-        // Khởi tạo ứng dụng Firebase với cấu hình tuỳ chỉnh
-        customApp = FirebaseApp.Create(options, "customApp_bank");
+        if(customApp==null){
+            Debug.Log("App chua duoc khoi tao!");
+            // Khởi tạo ứng dụng Firebase với cấu hình tuỳ chỉnh
+            customApp = FirebaseApp.Create(options, "customApp_bank");
 
-        // Khởi tạo Firebase Database với ứng dụng tuỳ chỉnh
-        databaseRef = FirebaseDatabase.GetInstance(customApp).RootReference;
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
-            Firebase.DependencyStatus status = task.Result;
-            if (status == Firebase.DependencyStatus.Available)
-            {
-                Debug.Log("Firebase is ready with custom config.");
-                ReadDataFromFirebase();
-            }
-            else
-            {
-                Debug.LogError($"Could not resolve all Firebase dependencies: {status}");
-            }
-        });
+            // Khởi tạo Firebase Database với ứng dụng tuỳ chỉnh
+            databaseRef = FirebaseDatabase.GetInstance(customApp).RootReference;
+            FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
+                Firebase.DependencyStatus status = task.Result;
+                if (status == Firebase.DependencyStatus.Available)
+                {
+                    Debug.Log("Firebase is ready with custom config.");
+                    ReadDataFromFirebase();
+                }
+                else
+                {
+                    Debug.LogError($"Could not resolve all Firebase dependencies: {status}");
+                }
+            });
+        }
+        else{
+            Debug.Log("App da duoc tao!");
+        } 
+
 
         this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
         this.Update_ui_list_bank();
