@@ -3,6 +3,7 @@ using Firebase.Database;
 using Firebase.Extensions;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class App : MonoBehaviour
 {
@@ -10,20 +11,21 @@ public class App : MonoBehaviour
     private DatabaseReference databaseRef;
     public Transform tr_all_item;
     private FirebaseApp customApp;
+    public Text txt_status_app;
     void Start()
     {
         // Tạo cấu hình Firebase tuỳ chỉnh
         AppOptions options = new AppOptions
         {
-            ApiKey = "AIzaSyBKQ51navOWhgLHY1flH7eK4hPuj9knOa0",                  // Thay bằng API Key của bạn
-            AppId = "14228562704",                    // Thay bằng App ID
-            ProjectId = "clbank",            // Thay bằng Project ID
-            DatabaseUrl = new Uri("https://clbank-default-rtdb.asia-southeast1.firebasedatabase.app"),  // Thay bằng URL của Firebase Database
-            StorageBucket = "clbank.appspot.com"     // Thay bằng Storage Bucket của Firebase
+            ApiKey = "AIzaSyBKQ51navOWhgLHY1flH7eK4hPuj9knOa0", 
+            AppId = "14228562704",
+            ProjectId = "clbank",
+            DatabaseUrl = new Uri("https://clbank-default-rtdb.asia-southeast1.firebasedatabase.app"),
+            StorageBucket = "clbank.appspot.com"
         };
 
         // Khởi tạo ứng dụng Firebase với cấu hình tuỳ chỉnh
-        customApp = FirebaseApp.Create(options, "customApp");
+        customApp = FirebaseApp.Create(options, "customApp_bank");
 
         // Khởi tạo Firebase Database với ứng dụng tuỳ chỉnh
         databaseRef = FirebaseDatabase.GetInstance(customApp).RootReference;
@@ -39,7 +41,6 @@ public class App : MonoBehaviour
                 Debug.LogError($"Could not resolve all Firebase dependencies: {status}");
             }
         });
-
     }
 
 
@@ -81,7 +82,8 @@ public class App : MonoBehaviour
 
                     bill.Set_Act_Click(() =>
                     {
-                        this.RunMirFileWithMemu();
+                        //this.RunMirFileWithMemu();
+                        this.RunCommandWithMemu("start");
                     });
                 }
             }
@@ -115,10 +117,27 @@ public class App : MonoBehaviour
         // Tạo tiến trình để chạy MEmu với file recorder .mir
         System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
         processInfo.FileName = memuPath;                  // Chạy memuc
-        processInfo.Arguments = "runmacro " + mirFilePath; // Tham số: chạy file recorder
+        processInfo.Arguments = "MEmuc -i 0 adb 'shell input tap 357 405'"; // Tham số: chạy file recorder
 
         // Khởi chạy tiến trình
         System.Diagnostics.Process.Start(processInfo);
         UnityEngine.Debug.Log("Running recorder file (.mir) with MEmu: " + mirFilePath);
+    }
+
+    public void Btn_start_Memu(){
+        this.txt_status_app.text="Memu emulator launched";
+        this.RunCommandWithMemu("start");
+    }
+
+    public void RunCommandWithMemu(string s_command)
+    {
+        string memuPath = @"J:\Microvirt\MEmu\MEmuc.exe"; 
+
+        System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
+        processInfo.FileName = memuPath; 
+        processInfo.Arguments = "MEmuc -i 0 "+s_command; 
+
+        System.Diagnostics.Process.Start(processInfo);
+        UnityEngine.Debug.Log("Running CMD with MEmu: " + s_command);
     }
 }

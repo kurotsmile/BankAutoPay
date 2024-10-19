@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class Bill_Item : MonoBehaviour
 {
     public Text txt_name;
+    public Text txt_date;
     public Text txt_tip;
     public UnityAction act_click;
 
