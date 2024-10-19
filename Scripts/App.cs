@@ -116,7 +116,7 @@ public class App : MonoBehaviour
     }
 
     void OnDisable() {
-        databaseRef.ValueChanged -= HandleValueChanged;
+        if(databaseRef!=null) databaseRef.ValueChanged -= HandleValueChanged;
         FirebaseDatabase.DefaultInstance.GoOffline();
     }
 
@@ -136,7 +136,7 @@ public class App : MonoBehaviour
 
     public void Btn_start_Memu(){
         this.txt_status_app.text="Memu emulator launched";
-        this.RunCommandWithMemu("start");
+        this.RunCommandWithMemu2("start");
     }
 
     public void RunCommandWithMemu(string s_command)
@@ -145,10 +145,41 @@ public class App : MonoBehaviour
 
         System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
         processInfo.FileName = memuPath; 
-        processInfo.Arguments = "\"MEmuc -i 0 " + s_command + "\"";
+        processInfo.Arguments = "MEmuc -i 0 " + s_command;
 
         System.Diagnostics.Process.Start(processInfo);
         UnityEngine.Debug.Log("Running CMD with MEmu: " + s_command);
+    }
+
+    public void RunCommandWithMemu2(string s_command)
+    {
+        string command = "/C J:\\Microvirt\\MEmu\\MEmuc.exe -i 0 " + s_command;
+        
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        process.StartInfo.FileName = "cmd.exe";
+        process.StartInfo.Arguments = command;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+        
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd();
+        UnityEngine.Debug.Log("Command output: " + output);
+    }
+    public void RunCommandWithPowerShell(string s_command)
+{
+        string command = $"& 'J:\\Microvirt\\MEmu\\MEmuc.exe' -i 0 {s_command}";
+
+        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        process.StartInfo.FileName = "powershell.exe";
+        process.StartInfo.Arguments = command;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.CreateNoWindow = true;
+        
+        process.Start();
+        string output = process.StandardOutput.ReadToEnd();
+        UnityEngine.Debug.Log("Command output: " + output);
     }
 
     private void Update_ui_list_bank(){
