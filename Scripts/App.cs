@@ -51,8 +51,10 @@ public class App : MonoBehaviour
                 Debug.LogError($"Could not resolve all Firebase dependencies: {status}");
             }
         });
-    }
 
+        this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
+        this.Update_ui_list_bank();
+    }
 
     void ReadDataFromFirebase()
     {
@@ -87,8 +89,8 @@ public class App : MonoBehaviour
                     Bill_Item bill = obj_bill.GetComponent<Bill_Item>();
 
                     if (moneySnapshot.HasChild("username")) bill.txt_name.text = moneySnapshot.Child("username").Value.ToString();
-
                     if (moneySnapshot.HasChild("money")) bill.txt_tip.text = moneySnapshot.Child("money").Value.ToString();
+                    if (moneySnapshot.HasChild("date")) bill.txt_date.text = moneySnapshot.Child("date").Value.ToString();
 
                     bill.Set_Act_Click(() =>
                     {
@@ -118,22 +120,6 @@ public class App : MonoBehaviour
         }
     }
 
-    public void RunMirFileWithMemu()
-    {
-        string memuPath = @"J:\Microvirt\MEmu\MEmuc.exe";  // Đường dẫn đến file MEmu.exe
-        string mirFilePath = @"J:\Microvirt\MEmu\scripts\20241018221107.mir"; // Đường dẫn đến file .mir
-
-
-        // Tạo tiến trình để chạy MEmu với file recorder .mir
-        System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
-        processInfo.FileName = memuPath;                  // Chạy memuc
-        processInfo.Arguments = "MEmuc -i 0 adb 'shell input tap 357 405'"; // Tham số: chạy file recorder
-
-        // Khởi chạy tiến trình
-        System.Diagnostics.Process.Start(processInfo);
-        UnityEngine.Debug.Log("Running recorder file (.mir) with MEmu: " + mirFilePath);
-    }
-
     public void Btn_start_Memu(){
         this.txt_status_app.text="Memu emulator launched";
         this.RunCommandWithMemu("start");
@@ -157,7 +143,41 @@ public class App : MonoBehaviour
     }
 
     public void Select_bank(int index){
+        PlayerPrefs.SetInt("index_sel_bank",index);
         this.index_sel_bank=index;
         this.Update_ui_list_bank();
+    }
+
+    public void QueryList()
+    {
+        DatabaseReference usersRef = databaseRef.Child("lich_su_nap_rut");
+        Query ageQuery = usersRef.OrderByChild("status").EqualTo("done");
+
+        ageQuery.GetValueAsync().ContinueWithOnMainThread(task => {
+            if (task.IsFaulted)
+            {
+                Debug.LogError("Lỗi truy vấn: " + task.Exception);
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                if (snapshot.Exists)
+                {
+                    foreach (var childSnapshot in snapshot.Children)
+                    {
+                        Debug.Log("User ID: " + childSnapshot.Key);
+                        Debug.Log("User Data: " + childSnapshot.GetRawJsonValue());
+                    }
+                }
+            }
+        });
+    }
+
+    void OnApplicationPause(bool pauseStatus) {
+        if (pauseStatus) {
+            FirebaseDatabase.DefaultInstance.GoOffline();
+        } else {
+            FirebaseDatabase.DefaultInstance.GoOnline();
+        }
     }
 }
