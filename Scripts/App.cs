@@ -12,6 +12,7 @@ public class App : MonoBehaviour
     public Color32 color_nomal;
     public Color32 color_sel;
     public ADB_Control adb;
+    public Carrot.Carrot cr;
 
     [Header("UI")]
     public Transform tr_all_item;
@@ -26,6 +27,7 @@ public class App : MonoBehaviour
     void Start()
     {
         //this.load_config_app();
+        this.cr.Load_Carrot();
         this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
         this.Update_ui_list_bank();
     }
@@ -164,7 +166,8 @@ public class App : MonoBehaviour
         
         process.Start();
         string output = process.StandardOutput.ReadToEnd();
-        UnityEngine.Debug.Log("Command output: " + output);
+        this.cr.Show_msg("Run Command",output,Carrot.Msg_Icon.Alert);
+        UnityEngine.Debug.Log("Command output: " + output+ " \nAt:"+command);
     }
     public void RunCommandWithPowerShell(string s_command)
 {
