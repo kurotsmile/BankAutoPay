@@ -232,8 +232,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -182.66003, y: -7.399994}
-  m_SizeDelta: {x: -401.65, y: -198.4}
+  m_AnchoredPosition: {x: -135.01752, y: -7.399994}
+  m_SizeDelta: {x: -306.36496, y: -198.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &476769963
 MonoBehaviour:
@@ -1555,6 +1555,30 @@ PrefabInstance:
       propertyPath: m_Text
       value: Vietcombank
       objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1667508230}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Select_bank
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: App, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1645,6 +1669,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
   m_PrefabInstance: {fileID: 1449397715}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1449397717 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+  m_PrefabInstance: {fileID: 1449397715}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1491664357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1940,8 +1975,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 258.8, y: -7.399994}
-  m_SizeDelta: {x: -555.43, y: -198.4}
+  m_AnchoredPosition: {x: 305.60248, y: -7.399994}
+  m_SizeDelta: {x: -649.035, y: -198.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1599089742
 MonoBehaviour:
@@ -1991,6 +2026,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1667508229}
   - component: {fileID: 1667508230}
+  - component: {fileID: 1667508231}
   m_Layer: 0
   m_Name: app
   m_TagString: Untagged
@@ -2026,8 +2062,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab_item_bill: {fileID: 6826375971300025288, guid: 1ada6001b9d614d4f8e19d2c4ab3173b, type: 3}
+  color_nomal:
+    serializedVersion: 2
+    rgba: 4281413937
+  color_sel:
+    serializedVersion: 2
+    rgba: 4278209200
   tr_all_item: {fileID: 1753495666}
   txt_status_app: {fileID: 486109017}
+  bank_items:
+  - {fileID: 1875572714007245714}
+  - {fileID: 1449397717}
+  - {fileID: 1909403699}
+--- !u!114 &1667508231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1667508228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec71fdac3a6801428ac3de090b847a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1753495665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2241,6 +2299,30 @@ PrefabInstance:
       propertyPath: m_Text
       value: Mbbank
       objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1667508230}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Select_bank
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: App, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2331,6 +2413,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
   m_PrefabInstance: {fileID: 1909403697}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1909403699 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+  m_PrefabInstance: {fileID: 1909403697}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2084684936
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2419,6 +2512,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4061760704145110918, guid: 1ada6001b9d614d4f8e19d2c4ab3173b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -6.799988
+      objectReference: {fileID: 0}
     - target: {fileID: 6826375971300025288, guid: 1ada6001b9d614d4f8e19d2c4ab3173b, type: 3}
       propertyPath: m_Name
       value: Item_bill
@@ -2444,6 +2541,26 @@ PrefabInstance:
     - target: {fileID: 681623195256531900, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
       propertyPath: m_Name
       value: Bank_Item_teckcombank
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1667508230}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Select_bank
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: App, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105553499366734946, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
       propertyPath: m_Pivot.x
@@ -2530,6 +2647,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+--- !u!114 &1875572714007245714 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
+  m_PrefabInstance: {fileID: 1875572714007245713}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

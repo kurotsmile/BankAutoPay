@@ -7,11 +7,21 @@ using UnityEngine.UI;
 
 public class App : MonoBehaviour
 {
+    [Header("Main Object")]
     public GameObject prefab_item_bill;
-    private DatabaseReference databaseRef;
+    public Color32 color_nomal;
+    public Color32 color_sel;
+
+    [Header("UI")]
     public Transform tr_all_item;
-    private FirebaseApp customApp;
     public Text txt_status_app;
+
+    [Header("Bank")]
+    public Bank_Item[] bank_items;
+
+    private DatabaseReference databaseRef;
+    private FirebaseApp customApp;
+    private int index_sel_bank;
     void Start()
     {
         // Tạo cấu hình Firebase tuỳ chỉnh
@@ -139,5 +149,15 @@ public class App : MonoBehaviour
 
         System.Diagnostics.Process.Start(processInfo);
         UnityEngine.Debug.Log("Running CMD with MEmu: " + s_command);
+    }
+
+    private void Update_ui_list_bank(){
+        for(int i=0;i<this.bank_items.Length;i++) this.bank_items[i].img_bk.color=this.color_nomal;
+        this.bank_items[this.index_sel_bank].img_bk.color=this.color_sel;
+    }
+
+    public void Select_bank(int index){
+        this.index_sel_bank=index;
+        this.Update_ui_list_bank();
     }
 }
