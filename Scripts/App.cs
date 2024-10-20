@@ -14,8 +14,10 @@ public class App : MonoBehaviour
     public Color32 color_colum_a;
     public Color32 color_colum_b;
     public ADB_Control adb;
+    public ADB_Editor adb_editor;
     public Carrot.Carrot cr;
     public Carrot_File file;
+    public GameObject item_box_prefab;
 
     [Header("UI")]
     public Transform tr_all_item;
@@ -93,6 +95,7 @@ public class App : MonoBehaviour
     }
 
     public void Btn_save_data(){
+        this.file.Set_filter(Carrot_File_Data.JsonData);
         this.adb.Save_data_json_control();
         this.cr.play_sound_click();
     }

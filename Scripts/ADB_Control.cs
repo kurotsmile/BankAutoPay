@@ -15,11 +15,10 @@ public class ADB_Control : MonoBehaviour
     private int index_comand_cur=0;
     private float timer_step=0;
     private bool is_play=false;
-    public GameObject item_control_prefab;
 
     [Header("Asset")]
     public Sprite sp_icon_mouse;
-    private Carrot.Carrot_Box box=null;
+    private Carrot_Box box=null;
 
     void ReadFileAndParseData(string path)
     {
@@ -100,7 +99,6 @@ public class ADB_Control : MonoBehaviour
     }
 
     private void Show_edit_control(int index){
-        Debug.Log(index);
         if(this.box!=null) this.box.close();
 
         IDictionary data_control=this.list_command[index];
@@ -155,7 +153,7 @@ public class ADB_Control : MonoBehaviour
                 var index=i;
                 IDictionary MmouseClick=list_command[i];
 
-                GameObject obj_control=Instantiate(this.item_control_prefab);
+                GameObject obj_control=Instantiate(this.app.item_box_prefab);
                 obj_control.transform.SetParent(this.app.tr_all_item);
                 obj_control.transform.localScale=new Vector3(1f,1f,1f);
                 obj_control.transform.localPosition=new Vector3(1f,1f,1f);
