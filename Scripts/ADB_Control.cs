@@ -11,14 +11,12 @@ public class ADB_Control : MonoBehaviour
 
     [Header("Main Obj")]
     public App app;
-    public List<IDictionary> list_command;
+    private List<IDictionary> list_command;
     private int index_comand_cur=0;
     private float timer_step=0;
     private bool is_play=false;
 
-    [Header("Asset")]
-    public Sprite sp_icon_mouse;
-    private Carrot_Box box=null;
+
 
     void ReadFileAndParseData(string path)
     {
@@ -43,7 +41,6 @@ public class ADB_Control : MonoBehaviour
                             }
                         }
                 }
-                this.Update_list_ui();
             }
         }
         catch (System.Exception e)
@@ -78,7 +75,7 @@ public class ADB_Control : MonoBehaviour
         return this.is_play;
     }
 
-    private void On_Mouse_Click(string x,string y){
+    public void On_Mouse_Click(string x,string y){
         this.app.txt_status_app.text="Tap x:"+x+" , y:"+y;
         this.RunCommandWithMemu("adb shell input tap "+x+" "+y);
     }
@@ -98,101 +95,4 @@ public class ADB_Control : MonoBehaviour
         this.app.txt_status_app.text=output;
     }
 
-    private void Show_edit_control(int index){
-        if(this.box!=null) this.box.close();
-
-        IDictionary data_control=this.list_command[index];
-
-        this.box=this.app.cr.Create_Box("Edit Control");
-        this.box.set_icon(this.sp_icon_mouse);
-
-        Carrot.Carrot_Box_Item inp_x=this.box.create_item("inp_x");
-        inp_x.set_title("Position x");
-        inp_x.set_tip("Position x mouse and tap");
-        inp_x.set_icon(this.app.cr.icon_carrot_write);
-        inp_x.set_type(Carrot.Box_Item_Type.box_value_input);
-        inp_x.set_val(data_control["x"].ToString());
-
-        Carrot.Carrot_Box_Item inp_y=this.box.create_item("inp_x");
-        inp_y.set_title("Position Y");
-        inp_y.set_tip("Position Y mouse and tap");
-        inp_y.set_icon(this.app.cr.icon_carrot_write);
-        inp_y.set_type(Carrot.Box_Item_Type.box_value_input);
-        inp_y.set_val(data_control["y"].ToString());
-
-        Carrot_Box_Btn_Panel btn_Panel=this.box.create_panel_btn();
-        Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_cancel");
-        btn_done.set_bk_color(this.app.cr.color_highlight);
-        btn_done.set_label("Done");
-        btn_done.set_label_color(Color.white);
-        btn_done.set_icon_white(this.app.cr.icon_carrot_done);
-        btn_done.set_act_click(()=>{
-            IDictionary data_new=(IDictionary) Carrot.Json.Deserialize("{}");
-            data_new["x"]=inp_x.get_val();
-            data_new["y"]=inp_y.get_val();
-            this.list_command[index]=data_new;
-            this.box.close();
-            this.app.cr.play_sound_click();
-            this.Update_list_ui();
-        });
-
-        Carrot_Button_Item btn_cancel=btn_Panel.create_btn("btn_cancel");
-        btn_cancel.set_bk_color(this.app.cr.color_highlight);
-        btn_cancel.set_label("Cancel");
-        btn_cancel.set_label_color(Color.white);
-        btn_cancel.set_icon_white(this.app.cr.icon_carrot_cancel);
-        btn_cancel.set_act_click(()=>{
-            this.box.close();
-            this.app.cr.play_sound_click();
-        });
-    }
-
-    void Update_list_ui(){
-        this.app.Clear_contain(this.app.tr_all_item);
-        for(int i=0;i<this.list_command.Count;i++){
-                var index=i;
-                IDictionary MmouseClick=list_command[i];
-
-                GameObject obj_control=Instantiate(this.app.item_box_prefab);
-                obj_control.transform.SetParent(this.app.tr_all_item);
-                obj_control.transform.localScale=new Vector3(1f,1f,1f);
-                obj_control.transform.localPosition=new Vector3(1f,1f,1f);
-                if(i%2==0)
-                    obj_control.GetComponent<Image>().color=this.app.color_colum_a;
-                else
-                    obj_control.GetComponent<Image>().color=this.app.color_colum_b;
-                Carrot.Carrot_Box_Item cr_item=obj_control.GetComponent<Carrot.Carrot_Box_Item>();
-                cr_item.set_title("Mouse Click");
-                cr_item.set_tip("X:"+MmouseClick["x"].ToString()+" , Y:"+MmouseClick["y"].ToString());
-                cr_item.check_type();
-                cr_item.set_icon_white(this.sp_icon_mouse);
-                cr_item.txt_name.color=Color.white;
-                cr_item.set_act(()=>{
-                    this.On_Mouse_Click(MmouseClick["x"].ToString(),MmouseClick["y"].ToString());
-                });
-
-                Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
-                btn_edit.set_icon_color(Color.white);
-                btn_edit.set_icon(app.cr.icon_carrot_write);
-                btn_edit.set_color(app.cr.color_highlight);
-                btn_edit.set_act(()=>{
-                    this.Show_edit_control(index);
-                });
-
-                Carrot_Box_Btn_Item btn_del=cr_item.create_item();
-                btn_del.set_icon_color(Color.white);
-                btn_del.set_icon(app.cr.sp_icon_del_data);
-                btn_del.set_color(app.cr.color_highlight);
-                btn_del.set_act(()=>{
-
-                });
-        }
-    }
-
-    public void Save_data_json_control(){
-        this.app.file.Save_file(paths=>{
-            string s_path=paths[0];
-            FileBrowserHelpers.WriteTextToFile(s_path,Carrot.Json.Serialize(this.list_command));
-        });
-    }
 }

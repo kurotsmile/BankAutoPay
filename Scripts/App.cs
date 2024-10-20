@@ -96,7 +96,7 @@ public class App : MonoBehaviour
 
     public void Btn_save_data(){
         this.file.Set_filter(Carrot_File_Data.JsonData);
-        this.adb.Save_data_json_control();
+        this.adb_editor.Save_data_json_control();
         this.cr.play_sound_click();
     }
 }
