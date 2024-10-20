@@ -11,6 +11,8 @@ public class App : MonoBehaviour
     public GameObject prefab_item_bill;
     public Color32 color_nomal;
     public Color32 color_sel;
+    public Color32 color_colum_a;
+    public Color32 color_colum_b;
     public ADB_Control adb;
     public Carrot.Carrot cr;
 
@@ -107,7 +109,7 @@ public class App : MonoBehaviour
 
                     bill.Set_Act_Click(() =>
                     {
-                        this.RunCommandWithMemu("start");
+                        this.adb.RunCommandWithMemu("start");
                     });
                 }
             }
@@ -142,22 +144,7 @@ public class App : MonoBehaviour
 
     public void Btn_start_Memu(){
         this.txt_status_app.text="Memu emulator launched";
-        this.RunCommandWithMemu("start");
-    }
-
-    public void RunCommandWithMemu(string s_command)
-    {
-        string command = "/C J:\\Microvirt\\MEmu\\MEmuc.exe -i 0 " + s_command;
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        process.StartInfo.FileName = "cmd.exe";
-        process.StartInfo.Arguments = command;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.CreateNoWindow = true;
-        
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        this.txt_status_app.text=output;
+        this.adb.RunCommandWithMemu("start");
     }
 
     private void Update_ui_list_bank(){
@@ -215,6 +202,11 @@ public class App : MonoBehaviour
             this.txt_btn_start.text="Stop";
             this.img_icon_btn_start.sprite=this.sp_icon_stop;
         }
+        this.cr.play_sound_click();
+    }
+
+    public void Btn_stop_memu(){
+        this.adb.RunCommandWithMemu("stop");
         this.cr.play_sound_click();
     }
 }
