@@ -17,23 +17,27 @@ public class App : MonoBehaviour
     [Header("UI")]
     public Transform tr_all_item;
     public Text txt_status_app;
+    public Text txt_btn_start;
+    public Image img_icon_btn_start;
 
     [Header("Bank")]
     public Bank_Item[] bank_items;
 
+    [Header("Asset")]
+    public Sprite sp_icon_start;
+    public Sprite sp_icon_stop;
     private DatabaseReference databaseRef;
     private FirebaseApp customApp;
     private int index_sel_bank;
+
     void Start()
     {
-        //this.load_config_app();
         this.cr.Load_Carrot();
         this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
         this.Update_ui_list_bank();
     }
 
-    public void load_config_app(){
-        // Tạo cấu hình Firebase tuỳ chỉnh
+    public void Load_config_app(){
         AppOptions options = new AppOptions
         {
             ApiKey = "AIzaSyBKQ51navOWhgLHY1flH7eK4hPuj9knOa0", 
@@ -45,10 +49,7 @@ public class App : MonoBehaviour
 
         if(customApp==null){
             this.txt_status_app.text="Start software initialization and server connection...";
-            // Khởi tạo ứng dụng Firebase với cấu hình tuỳ chỉnh
             customApp = FirebaseApp.Create(options, "customApp_bank");
-
-            // Khởi tạo Firebase Database với ứng dụng tuỳ chỉnh
             databaseRef = FirebaseDatabase.GetInstance(customApp).RootReference;
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
                 Firebase.DependencyStatus status = task.Result;
@@ -124,8 +125,11 @@ public class App : MonoBehaviour
 
     public void Quit_App()
     {
+        this.cr.play_sound_click();
         this.OnDisable();
-        Application.Quit();
+        this.cr.delay_function(2f,()=>{
+            Application.Quit();
+        });
     }
 
     public void Clear_contain(Transform tr)
@@ -138,25 +142,12 @@ public class App : MonoBehaviour
 
     public void Btn_start_Memu(){
         this.txt_status_app.text="Memu emulator launched";
-        this.RunCommandWithMemu2("start");
+        this.RunCommandWithMemu("start");
     }
 
     public void RunCommandWithMemu(string s_command)
     {
-        string memuPath = @"J:\Microvirt\MEmu\MEmuc.exe"; 
-
-        System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
-        processInfo.FileName = memuPath; 
-        processInfo.Arguments = "MEmuc -i 0 " + s_command;
-
-        System.Diagnostics.Process.Start(processInfo);
-        UnityEngine.Debug.Log("Running CMD with MEmu: " + s_command);
-    }
-
-    public void RunCommandWithMemu2(string s_command)
-    {
         string command = "/C J:\\Microvirt\\MEmu\\MEmuc.exe -i 0 " + s_command;
-        
         System.Diagnostics.Process process = new System.Diagnostics.Process();
         process.StartInfo.FileName = "cmd.exe";
         process.StartInfo.Arguments = command;
@@ -166,23 +157,7 @@ public class App : MonoBehaviour
         
         process.Start();
         string output = process.StandardOutput.ReadToEnd();
-        this.cr.Show_msg("Run Command",output,Carrot.Msg_Icon.Alert);
-        UnityEngine.Debug.Log("Command output: " + output+ " \nAt:"+command);
-    }
-    public void RunCommandWithPowerShell(string s_command)
-{
-        string command = $"& 'J:\\Microvirt\\MEmu\\MEmuc.exe' -i 0 {s_command}";
-
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        process.StartInfo.FileName = "powershell.exe";
-        process.StartInfo.Arguments = command;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.CreateNoWindow = true;
-        
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        UnityEngine.Debug.Log("Command output: " + output);
+        this.txt_status_app.text=output;
     }
 
     private void Update_ui_list_bank(){
@@ -194,6 +169,7 @@ public class App : MonoBehaviour
         PlayerPrefs.SetInt("index_sel_bank",index);
         this.index_sel_bank=index;
         this.Update_ui_list_bank();
+        this.cr.play_sound_click();
     }
 
     public void QueryList()
@@ -227,5 +203,18 @@ public class App : MonoBehaviour
         } else {
             FirebaseDatabase.DefaultInstance.GoOnline();
         }
+    }
+
+    public void Btn_start_auto(){
+        if(this.adb.get_status()){
+            this.adb.On_Stop();
+            this.txt_btn_start.text="Start";
+            this.img_icon_btn_start.sprite=this.sp_icon_start;
+        }else{
+            this.adb.On_Start(this.bank_items[this.index_sel_bank].name_file_macro);
+            this.txt_btn_start.text="Stop";
+            this.img_icon_btn_start.sprite=this.sp_icon_stop;
+        }
+        this.cr.play_sound_click();
     }
 }
