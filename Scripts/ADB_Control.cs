@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Carrot;
+using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 public class ADB_Control : MonoBehaviour
@@ -179,6 +180,21 @@ public class ADB_Control : MonoBehaviour
                 btn_edit.set_act(()=>{
                     this.Show_edit_control(index);
                 });
+
+                Carrot_Box_Btn_Item btn_del=cr_item.create_item();
+                btn_del.set_icon_color(Color.white);
+                btn_del.set_icon(app.cr.sp_icon_del_data);
+                btn_del.set_color(app.cr.color_highlight);
+                btn_del.set_act(()=>{
+
+                });
         }
+    }
+
+    public void Save_data_json_control(){
+        this.app.file.Save_file(paths=>{
+            string s_path=paths[0];
+            FileBrowserHelpers.WriteTextToFile(s_path,Carrot.Json.Serialize(this.list_command));
+        });
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Carrot;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ public class App : MonoBehaviour
     public Color32 color_colum_b;
     public ADB_Control adb;
     public Carrot.Carrot cr;
+    public Carrot_File file;
 
     [Header("UI")]
     public Transform tr_all_item;
@@ -87,6 +89,11 @@ public class App : MonoBehaviour
 
     public void Btn_stop_memu(){
         this.adb.RunCommandWithMemu("stop");
+        this.cr.play_sound_click();
+    }
+
+    public void Btn_save_data(){
+        this.adb.Save_data_json_control();
         this.cr.play_sound_click();
     }
 }
