@@ -20,7 +20,7 @@ public class ADB_Editor : MonoBehaviour
     public Sprite sp_icon_mouse;
     public Sprite sp_icon_open_app;
     public Sprite sp_icon_waiting;
-
+    public Sprite sp_icon_send_text;
 
     private IList list_command;
 
@@ -46,6 +46,14 @@ public class ADB_Editor : MonoBehaviour
 
         this.Item_Left("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.waiting);
+        });
+
+        this.Item_Left("Send Text","Send Text to Device as Clipboard",this.sp_icon_send_text).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
+        });
+
+        this.Item_Left("All Device","Get list Devices",this.sp_icon_send_text).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
         });
     }
 
@@ -106,10 +114,17 @@ public class ADB_Editor : MonoBehaviour
                     cr_item.set_tip("Timer:"+control_data["timer"].ToString());
                 }
 
+                if(control_data["type"].ToString()=="send_text"){
+                    cr_item.set_icon_white(this.sp_icon_send_text);
+                    cr_item.set_title("Send Text");
+                    cr_item.set_tip("Text:"+control_data["text"].ToString());
+                }
+
                 cr_item.check_type();
                 cr_item.txt_name.color=Color.white;
                 cr_item.set_act(()=>{
                     if(control_data["type"].ToString()=="mouse_click") this.app.adb.On_Mouse_Click(control_data["x"].ToString(),control_data["y"].ToString());
+                    if(control_data["type"].ToString()=="send_text") this.app.adb.On_Send_Text(control_data["text"].ToString());
                 });
 
                 Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
@@ -120,6 +135,7 @@ public class ADB_Editor : MonoBehaviour
                     if(control_data["type"].ToString()=="mouse_click") this.Show_edit_control(index,CONTROL_ADB_TYPE.mouse_click);
                     if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
                     if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
+                    if(control_data["type"].ToString()=="send_text") this.Show_edit_control(index,CONTROL_ADB_TYPE.send_text);
                 });
 
                 Carrot_Box_Btn_Item btn_del=cr_item.create_item();
@@ -244,6 +260,38 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["timer"]=inp_timer.get_val();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
+
+        if(type==CONTROL_ADB_TYPE.send_text){
+            this.box.set_icon(this.sp_icon_send_text);
+            if(index==-1)
+                this.box.set_title("Add Send Text");
+            else
+                this.box.set_title("Update Send Text");
+            Carrot.Carrot_Box_Item inp_text=this.box.create_item("inp_text");
+            inp_text.set_title("Text");
+            inp_text.set_tip("Enter the text you want to insert into the device");
+            inp_text.set_icon(this.app.cr.icon_carrot_write);
+            inp_text.set_type(Carrot.Box_Item_Type.box_value_input);
+            if(data_control["text"]!=null) inp_text.set_val(data_control["text"].ToString());
+
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["text"]=inp_text.get_val();
                 if(index!=-1)
                     this.list_command[index]=data_control;
                 else
