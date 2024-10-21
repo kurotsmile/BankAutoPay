@@ -5,7 +5,7 @@ using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text}
+public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text,waiting}
 public class ADB_Editor : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -19,6 +19,7 @@ public class ADB_Editor : MonoBehaviour
     [Header("Asset")]
     public Sprite sp_icon_mouse;
     public Sprite sp_icon_open_app;
+    public Sprite sp_icon_waiting;
 
 
     private IList list_command;
@@ -35,8 +36,17 @@ public class ADB_Editor : MonoBehaviour
     }
 
     private void Load_Menu_Right(){
-        this.Item_Left("Add Mouse click","Add position x,y click",this.sp_icon_mouse);
-        this.Item_Left("Open The App","Open the application with the package name",this.sp_icon_open_app);
+        this.Item_Left("Add Mouse click","Add position x,y click",this.sp_icon_mouse).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.mouse_click);
+        });
+
+        this.Item_Left("Open The App","Open the application with the package name",this.sp_icon_open_app).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.open_app);
+        });
+
+        this.Item_Left("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.waiting);
+        });
     }
 
     private Carrot_Box_Item Item_Left(string s_title,string s_tip,Sprite s_icon){
@@ -52,9 +62,6 @@ public class ADB_Editor : MonoBehaviour
         item_box.txt_name.color=Color.white;
         item_box.GetComponent<Image>().color=this.app.color_colum_a;
         item_box.check_type();
-        item_box.set_act(()=>{
-                this.Show_edit_control(-1);
-        });
         return item_box;
     }
 
@@ -69,7 +76,7 @@ public class ADB_Editor : MonoBehaviour
         this.app.Clear_contain(this.app.tr_all_item);
         for(int i=0;i<this.list_command.Count;i++){
                 var index=i;
-                IDictionary MmouseClick=(IDictionary) list_command[i];
+                IDictionary control_data=(IDictionary) list_command[i];
 
                 GameObject obj_control=Instantiate(this.app.item_box_prefab);
                 obj_control.transform.SetParent(this.app.tr_all_item);
@@ -80,13 +87,29 @@ public class ADB_Editor : MonoBehaviour
                 else
                     obj_control.GetComponent<Image>().color=this.app.color_colum_b;
                 Carrot.Carrot_Box_Item cr_item=obj_control.GetComponent<Carrot.Carrot_Box_Item>();
-                cr_item.set_title("Mouse Click");
-                cr_item.set_tip("X:"+MmouseClick["x"].ToString()+" , Y:"+MmouseClick["y"].ToString());
+
+                if(control_data["type"].ToString()=="mouse_click"){
+                    cr_item.set_icon_white(this.sp_icon_mouse);
+                    cr_item.set_title("Mouse Click");
+                    cr_item.set_tip("X:"+control_data["x"].ToString()+" , Y:"+control_data["y"].ToString());
+                }
+
+                if(control_data["type"].ToString()=="open_app"){
+                    cr_item.set_icon_white(this.sp_icon_open_app);
+                    cr_item.set_title("Open App");
+                    cr_item.set_tip("App id:"+control_data["id_app"].ToString());
+                }
+
+                if(control_data["type"].ToString()=="waiting"){
+                    cr_item.set_icon_white(this.sp_icon_waiting);
+                    cr_item.set_title("Waiting");
+                    cr_item.set_tip("Timer:"+control_data["timer"].ToString());
+                }
+
                 cr_item.check_type();
-                cr_item.set_icon_white(this.sp_icon_mouse);
                 cr_item.txt_name.color=Color.white;
                 cr_item.set_act(()=>{
-                    this.app.adb.On_Mouse_Click(MmouseClick["x"].ToString(),MmouseClick["y"].ToString());
+                    if(control_data["type"].ToString()=="mouse_click") this.app.adb.On_Mouse_Click(control_data["x"].ToString(),control_data["y"].ToString());
                 });
 
                 Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
@@ -94,7 +117,9 @@ public class ADB_Editor : MonoBehaviour
                 btn_edit.set_icon(app.cr.icon_carrot_write);
                 btn_edit.set_color(app.cr.color_highlight);
                 btn_edit.set_act(()=>{
-                    this.Show_edit_control(index);
+                    if(control_data["type"].ToString()=="mouse_click") this.Show_edit_control(index,CONTROL_ADB_TYPE.mouse_click);
+                    if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
+                    if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
                 });
 
                 Carrot_Box_Btn_Item btn_del=cr_item.create_item();
@@ -108,7 +133,7 @@ public class ADB_Editor : MonoBehaviour
         }
     }
 
-    private void Show_edit_control(int index){
+    private void Show_edit_control(int index,CONTROL_ADB_TYPE type){
         if(this.box!=null) this.box.close();
 
         IDictionary data_control=null;
@@ -119,45 +144,115 @@ public class ADB_Editor : MonoBehaviour
             data_control=(IDictionary) Carrot.Json.Deserialize("{}");
             data_control["x"]=0;
             data_control["y"]=0;
-            data_control["type"]="mouse_click";
+            data_control["type"]=type.ToString();
         }
-            
 
-        this.box=this.app.cr.Create_Box("Edit Control");
-        this.box.set_icon(this.sp_icon_mouse);
-
-        Carrot.Carrot_Box_Item inp_x=this.box.create_item("inp_x");
-        inp_x.set_title("Position x");
-        inp_x.set_tip("Position x mouse and tap");
-        inp_x.set_icon(this.app.cr.icon_carrot_write);
-        inp_x.set_type(Carrot.Box_Item_Type.box_value_input);
-        inp_x.set_val(data_control["x"].ToString());
-
-        Carrot.Carrot_Box_Item inp_y=this.box.create_item("inp_x");
-        inp_y.set_title("Position Y");
-        inp_y.set_tip("Position Y mouse and tap");
-        inp_y.set_icon(this.app.cr.icon_carrot_write);
-        inp_y.set_type(Carrot.Box_Item_Type.box_value_input);
-        inp_y.set_val(data_control["y"].ToString());
-
-        Carrot_Box_Btn_Panel btn_Panel=this.box.create_panel_btn();
-        Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_cancel");
-        btn_done.set_bk_color(this.app.cr.color_highlight);
-        btn_done.set_label("Done");
-        btn_done.set_label_color(Color.white);
-        btn_done.set_icon_white(this.app.cr.icon_carrot_done);
-        btn_done.set_act_click(()=>{
-            IDictionary data_new=(IDictionary) Carrot.Json.Deserialize("{}");
-            data_new["x"]=inp_x.get_val();
-            data_new["y"]=inp_y.get_val();
-            if(index!=-1)
-                this.list_command[index]=data_new;
+        this.box=this.app.cr.Create_Box("box_control_edit");
+        Carrot_Box_Btn_Panel btn_Panel=null;
+        if(type==CONTROL_ADB_TYPE.mouse_click){
+            this.box.set_icon(this.sp_icon_mouse);
+            if(index==-1)
+                this.box.set_title("Add Mouse Click");
             else
-                this.list_command.Add(data_new);
-            this.box.close();
-            this.app.cr.play_sound_click();
-            this.Update_list_ui();
-        });
+                this.box.set_title("Update Mouse Click");
+            Carrot.Carrot_Box_Item inp_x=this.box.create_item("inp_x");
+            inp_x.set_title("Position x");
+            inp_x.set_tip("Position x mouse and tap");
+            inp_x.set_icon(this.app.cr.icon_carrot_write);
+            inp_x.set_type(Carrot.Box_Item_Type.box_number_input);
+            inp_x.set_val(data_control["x"].ToString());
+
+            Carrot.Carrot_Box_Item inp_y=this.box.create_item("inp_x");
+            inp_y.set_title("Position Y");
+            inp_y.set_tip("Position Y mouse and tap");
+            inp_y.set_icon(this.app.cr.icon_carrot_write);
+            inp_y.set_type(Carrot.Box_Item_Type.box_number_input);
+            inp_y.set_val(data_control["y"].ToString());
+
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["x"]=inp_x.get_val();
+                data_control["y"]=inp_y.get_val();
+                data_control["type"]=type.ToString();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
+
+        if(type==CONTROL_ADB_TYPE.open_app){
+            this.box.set_icon(this.sp_icon_open_app);
+            if(index==-1)
+                this.box.set_title("Add Open App");
+            else
+                this.box.set_title("Update Open App");
+            Carrot.Carrot_Box_Item inp_id_app=this.box.create_item("id_app");
+            inp_id_app.set_title("Application Package Name (Application ID)");
+            inp_id_app.set_tip("Enter the application name and main startup function");
+            inp_id_app.set_icon(this.app.cr.icon_carrot_write);
+            inp_id_app.set_type(Carrot.Box_Item_Type.box_value_input);
+            if(data_control["id_app"]!=null) inp_id_app.set_val(data_control["id_app"].ToString());
+
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["id_app"]=inp_id_app.get_val();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
+
+        if(type==CONTROL_ADB_TYPE.waiting){
+            this.box.set_icon(this.sp_icon_waiting);
+            if(index==-1)
+                this.box.set_title("Add Waiting");
+            else
+                this.box.set_title("Update Waiting");
+            Carrot.Carrot_Box_Item inp_timer=this.box.create_item("timer");
+            inp_timer.set_title("Waiting time");
+            inp_timer.set_tip("Enter the number of seconds to wait");
+            inp_timer.set_icon(this.app.cr.icon_carrot_write);
+            inp_timer.set_type(Carrot.Box_Item_Type.box_number_input);
+            if(data_control["timer"]!=null) inp_timer.set_val(data_control["timer"].ToString());
+
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["timer"]=inp_timer.get_val();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
 
         Carrot_Button_Item btn_cancel=btn_Panel.create_btn("btn_cancel");
         btn_cancel.set_bk_color(this.app.cr.color_highlight);

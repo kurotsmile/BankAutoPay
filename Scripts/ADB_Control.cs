@@ -21,39 +21,7 @@ public class ADB_Control : MonoBehaviour
     private float timer_step=0;
     private bool is_play=false;
 
-    void ReadFileAndParseData(string path)
-    {
-        try
-        {
-            using (StreamReader sr = new StreamReader(path))
-            {
-                string line;
-                this.list_command=new List<IDictionary>();
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] parts = line.Split(':');
-                        if (parts.Length == 3)
-                        {
-                            if (int.TryParse(parts[1], out int x) && int.TryParse(parts[2], out int y))
-                            {
-                                Debug.Log("Mouse click x:"+x+",y:"+y);
-                                IDictionary MmouseClick=(IDictionary) Carrot.Json.Deserialize("{}");
-                                MmouseClick["x"]=x;
-                                MmouseClick["y"]=y;
-                                this.list_command.Add(MmouseClick);
-                            }
-                        }
-                }
-            }
-        }
-        catch (System.Exception e)
-        {
-            this.app.cr.Show_msg("File could not be read: " + e.Message,"ADB Control",Carrot.Msg_Icon.Alert);
-        }
-    }
-
     public void On_Start(string filePath){
-        this.ReadFileAndParseData(filePath);
         this.index_comand_cur=0;
         this.is_play=true;
     }
@@ -80,6 +48,8 @@ public class ADB_Control : MonoBehaviour
                 this.timer_step=0;
 
                 IDictionary data_item=(IDictionary) this.list_command[this.index_comand_cur];
+
+                if(data_item["type"].ToString()=="mouse_click") this.On_Mouse_Click(data_item["x"].ToString(),data_item["y"].ToString());
                 this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
                 if(this.index_comand_cur>=this.list_command.Count){

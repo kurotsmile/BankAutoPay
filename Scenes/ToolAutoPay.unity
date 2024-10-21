@@ -4670,6 +4670,7 @@ MonoBehaviour:
   txt_play: {fileID: 754669029}
   sp_icon_mouse: {fileID: 21300000, guid: c7192fcc541a2fd4398f46f702b327ef, type: 3}
   sp_icon_open_app: {fileID: 21300000, guid: 56eda39d357752945af264dde61b3ced, type: 3}
+  sp_icon_waiting: {fileID: 21300000, guid: d716d72d584e1c5479acf98e5b6a0e22, type: 3}
 --- !u!1 &1753495665
 GameObject:
   m_ObjectHideFlags: 0
