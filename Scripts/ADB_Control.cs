@@ -5,18 +5,18 @@ using System.IO;
 using Carrot;
 using SimpleFileBrowser;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 public class ADB_Control : MonoBehaviour
 {
 
     [Header("Main Obj")]
     public App app;
-    private List<IDictionary> list_command;
+    private IList list_command;
+
     private int index_comand_cur=0;
     private float timer_step=0;
     private bool is_play=false;
-
-
 
     void ReadFileAndParseData(string path)
     {
@@ -55,12 +55,27 @@ public class ADB_Control : MonoBehaviour
         this.is_play=true;
     }
 
+    public void On_Play(IList list_cmd){
+        this.list_command=list_cmd;
+        if(this.list_command.Count==0){
+            this.app.cr.Show_msg("No commands have been created yet!","ADB Control",Msg_Icon.Alert);
+        }
+        else
+        {
+            this.is_play=true;    
+        }
+        
+    }
+
     void Update()
     {
         if(this.is_play){
             this.timer_step+=1f*Time.deltaTime;
             if(this.timer_step>=2f){
                 this.timer_step=0;
+
+                IDictionary data_item=(IDictionary) this.list_command[this.index_comand_cur];
+
                 this.index_comand_cur++;
                 Debug.Log("Done Step");
             }
@@ -80,7 +95,7 @@ public class ADB_Control : MonoBehaviour
         this.RunCommandWithMemu("adb shell input tap "+x+" "+y);
     }
 
-    public void RunCommandWithMemu(string s_command)
+    public void RunCommandWithMemu(string s_command,UnityAction<string> act_done=null)
     {
         string command = "/C J:\\Microvirt\\MEmu\\MEmuc.exe -i 0 " + s_command;
         System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -93,6 +108,7 @@ public class ADB_Control : MonoBehaviour
         process.Start();
         string output = process.StandardOutput.ReadToEnd();
         this.app.txt_status_app.text=output;
+        if(act_done!=null) act_done(output);
     }
 
 }

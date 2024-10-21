@@ -12,6 +12,8 @@ public class ADB_Editor : MonoBehaviour
 
     [Header("UI")]
     public GameObject panel_btn;
+    public Image img_icon_play;
+    public Text txt_play;
 
     [Header("Asset")]
     public Sprite sp_icon_mouse;
@@ -169,5 +171,17 @@ public class ADB_Editor : MonoBehaviour
             this.list_command= (IList) Carrot.Json.Deserialize(FileBrowserHelpers.ReadTextFromFile(s_path));
             this.Update_list_ui();
         });
+    }
+
+    public void Play_all_comand(){
+        if(this.app.adb.get_status()){
+            this.txt_play.text="Stop";
+            this.img_icon_play.sprite=this.app.sp_icon_stop;
+            this.app.adb.On_Stop();
+        }else{
+            this.txt_play.text="Play";
+            this.img_icon_play.sprite=this.app.sp_icon_start;
+            this.app.adb.On_Play(this.list_command);
+        }
     }
 }
