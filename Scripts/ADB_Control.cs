@@ -12,6 +12,9 @@ public class ADB_Control : MonoBehaviour
 
     [Header("Main Obj")]
     public App app;
+
+    [Header("UI")]
+    public Slider slider_process_length;
     private IList list_command;
 
     private int index_comand_cur=0;
@@ -57,6 +60,9 @@ public class ADB_Control : MonoBehaviour
 
     public void On_Play(IList list_cmd){
         this.list_command=list_cmd;
+        this.slider_process_length.maxValue=list_cmd.Count;
+        this.slider_process_length.value=0;
+        this.index_comand_cur=0;
         if(this.list_command.Count==0){
             this.app.cr.Show_msg("No commands have been created yet!","ADB Control",Msg_Icon.Alert);
         }
@@ -64,7 +70,6 @@ public class ADB_Control : MonoBehaviour
         {
             this.is_play=true;    
         }
-        
     }
 
     void Update()
@@ -75,8 +80,11 @@ public class ADB_Control : MonoBehaviour
                 this.timer_step=0;
 
                 IDictionary data_item=(IDictionary) this.list_command[this.index_comand_cur];
-
+                this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
+                if(this.index_comand_cur>=this.list_command.Count){
+                    this.On_Stop();
+                }
                 Debug.Log("Done Step");
             }
         }

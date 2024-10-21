@@ -5,6 +5,7 @@ using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text}
 public class ADB_Editor : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -17,6 +18,8 @@ public class ADB_Editor : MonoBehaviour
 
     [Header("Asset")]
     public Sprite sp_icon_mouse;
+    public Sprite sp_icon_open_app;
+
 
     private IList list_command;
 
@@ -32,21 +35,27 @@ public class ADB_Editor : MonoBehaviour
     }
 
     private void Load_Menu_Right(){
-       GameObject obj_item=Instantiate(this.app.item_box_prefab);
-       obj_item.transform.SetParent(this.app.tr_all_item_right);
-       obj_item.transform.localPosition=new Vector3(1f,1f,1f);
-       obj_item.transform.localScale=new Vector3(1f,1f,1f);
+        this.Item_Left("Add Mouse click","Add position x,y click",this.sp_icon_mouse);
+        this.Item_Left("Open The App","Open the application with the package name",this.sp_icon_open_app);
+    }
 
-       Carrot_Box_Item item_box=obj_item.GetComponent<Carrot_Box_Item>();
-       item_box.set_icon_white(this.app.cr.icon_carrot_add);
-       item_box.set_title("Add Mouse click");
-       item_box.set_tip("Add position x,y click");
-       item_box.txt_name.color=Color.white;
-       item_box.GetComponent<Image>().color=this.app.color_colum_a;
-       item_box.check_type();
-       item_box.set_act(()=>{
-            this.Show_edit_control(-1);
-       });
+    private Carrot_Box_Item Item_Left(string s_title,string s_tip,Sprite s_icon){
+        GameObject obj_item=Instantiate(this.app.item_box_prefab);
+        obj_item.transform.SetParent(this.app.tr_all_item_right);
+        obj_item.transform.localPosition=new Vector3(1f,1f,1f);
+        obj_item.transform.localScale=new Vector3(1f,1f,1f);
+
+        Carrot_Box_Item item_box=obj_item.GetComponent<Carrot_Box_Item>();
+        item_box.set_icon_white(s_icon);
+        item_box.set_title(s_title);
+        item_box.set_tip(s_tip);
+        item_box.txt_name.color=Color.white;
+        item_box.GetComponent<Image>().color=this.app.color_colum_a;
+        item_box.check_type();
+        item_box.set_act(()=>{
+                this.Show_edit_control(-1);
+        });
+        return item_box;
     }
 
     public void Save_data_json_control(){
@@ -110,6 +119,7 @@ public class ADB_Editor : MonoBehaviour
             data_control=(IDictionary) Carrot.Json.Deserialize("{}");
             data_control["x"]=0;
             data_control["y"]=0;
+            data_control["type"]="mouse_click";
         }
             
 
