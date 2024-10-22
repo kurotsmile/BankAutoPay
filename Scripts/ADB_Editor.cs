@@ -5,7 +5,7 @@ using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text,waiting}
+public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text,waiting,swipe}
 public class ADB_Editor : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -21,6 +21,7 @@ public class ADB_Editor : MonoBehaviour
     public Sprite sp_icon_open_app;
     public Sprite sp_icon_waiting;
     public Sprite sp_icon_send_text;
+    public Sprite sp_icon_swipe;
 
     private IList list_command;
 
@@ -52,7 +53,7 @@ public class ADB_Editor : MonoBehaviour
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
         });
 
-        this.Item_Left("All Device","Get list Devices",this.sp_icon_send_text).set_act(()=>{
+        this.Item_Left("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
         });
     }

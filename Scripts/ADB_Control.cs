@@ -1,9 +1,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using Carrot;
-using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -93,6 +91,12 @@ public class ADB_Control : MonoBehaviour
         this.app.txt_status_app.text="Send Text:"+s_text;
         this.RunCommandWithMemu("adb shell input text \""+s_text+"\"");
     }
+
+    public void On_Swipe(string x1,string y1,string x2,string y2,int timer_ms){
+        this.app.txt_status_app.text="Swipe "+x1+","+y1+" -> "+x2+","+y2;
+        this.RunCommandWithMemu("adb shell shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+    }
+
     public void RunCommandWithMemu(string s_command,UnityAction<string> act_done=null)
     {
         string command = "/C J:\\Microvirt\\MEmu\\MEmuc.exe -i 0 " + s_command;
@@ -111,7 +115,7 @@ public class ADB_Control : MonoBehaviour
 
      public void RunADBCommand(string command,UnityAction<string> Act_done=null)
     {
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
+        System.Diagnostics.Process process = new();
         process.StartInfo.FileName = "cmd.exe";
         process.StartInfo.Arguments = "/c " + command;
         process.StartInfo.RedirectStandardOutput = true;

@@ -4962,6 +4962,7 @@ MonoBehaviour:
   sp_icon_open_app: {fileID: 21300000, guid: 56eda39d357752945af264dde61b3ced, type: 3}
   sp_icon_waiting: {fileID: 21300000, guid: d716d72d584e1c5479acf98e5b6a0e22, type: 3}
   sp_icon_send_text: {fileID: 21300000, guid: f2d81f34afd7d424485ca3428342363c, type: 3}
+  sp_icon_swipe: {fileID: 21300000, guid: 503df9e4e04583c4883aacc24f444269, type: 3}
 --- !u!1 &1753495665
 GameObject:
   m_ObjectHideFlags: 0
