@@ -5,7 +5,7 @@ using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CONTROL_ADB_TYPE{mouse_click,open_app,close_app,send_text,waiting,swipe}
+public enum CONTROL_ADB_TYPE{mouse_click,open_app,close_app,close_all_app,send_text,waiting,swipe}
 public class ADB_Editor : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -23,6 +23,7 @@ public class ADB_Editor : MonoBehaviour
     public Sprite sp_icon_waiting;
     public Sprite sp_icon_send_text;
     public Sprite sp_icon_swipe;
+    public Sprite sp_icon_stop_all;
 
     private IList list_command;
 
@@ -60,6 +61,11 @@ public class ADB_Editor : MonoBehaviour
 
         this.Item_Left("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.swipe);
+        });
+
+        this.Item_Left("Stop all applications","Stop all user applications excluding system applications",this.sp_icon_stop_all).set_act(()=>{
+            this.Add_item_for_list(CONTROL_ADB_TYPE.close_all_app,"Stop all applications");
+            this.Update_list_ui();
         });
     }
 
@@ -135,7 +141,13 @@ public class ADB_Editor : MonoBehaviour
                 if(control_data["type"].ToString()=="swipe"){
                     cr_item.set_icon_white(this.sp_icon_swipe);
                     cr_item.set_title("Swipe");
-                    cr_item.set_tip("Move To :"+control_data["x"].ToString());
+                    cr_item.set_tip("Move To :"+control_data["x1"].ToString()+","+control_data["y1"].ToString()+" -> "+control_data["x2"].ToString()+","+control_data["y2"].ToString());
+                }
+
+                 if(control_data["type"].ToString()=="close_all_app"){
+                    cr_item.set_icon_white(this.sp_icon_stop_all);
+                    cr_item.set_title("Stop All");
+                    cr_item.set_tip(control_data["tip"].ToString());
                 }
 
                 cr_item.check_type();
@@ -145,20 +157,25 @@ public class ADB_Editor : MonoBehaviour
                     if(control_data["type"].ToString()=="send_text") this.app.adb.On_Send_Text(control_data["text"].ToString());
                     if(control_data["type"].ToString()=="open_app") this.app.adb.On_Open_App(control_data["id_app"].ToString());
                     if(control_data["type"].ToString()=="close_app") this.app.adb.On_Stop_App(control_data["id_app"].ToString());
+                    if(control_data["type"].ToString()=="close_all_app") this.app.adb.On_stop_all_app();
+                    if(control_data["type"].ToString()=="swipe")  this.app.adb.On_Swipe(control_data["x1"].ToString(),control_data["y1"].ToString(),control_data["x2"].ToString(),control_data["y2"].ToString(),int.Parse(control_data["timer"].ToString()));
                 });
 
-                Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
-                btn_edit.set_icon_color(Color.white);
-                btn_edit.set_icon(app.cr.icon_carrot_write);
-                btn_edit.set_color(app.cr.color_highlight);
-                btn_edit.set_act(()=>{
-                    if(control_data["type"].ToString()=="mouse_click") this.Show_edit_control(index,CONTROL_ADB_TYPE.mouse_click);
-                    if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
-                    if(control_data["type"].ToString()=="close_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.close_app);
-                    if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
-                    if(control_data["type"].ToString()=="send_text") this.Show_edit_control(index,CONTROL_ADB_TYPE.send_text);
-                    if(control_data["type"].ToString()=="swipe") this.Show_edit_control(index,CONTROL_ADB_TYPE.swipe);
-                });
+                if(control_data["type"].ToString()!="close_all_app"){
+                    Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
+                    btn_edit.set_icon_color(Color.white);
+                    btn_edit.set_icon(app.cr.icon_carrot_write);
+                    btn_edit.set_color(app.cr.color_highlight);
+                    btn_edit.set_act(()=>{
+                        if(control_data["type"].ToString()=="mouse_click") this.Show_edit_control(index,CONTROL_ADB_TYPE.mouse_click);
+                        if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
+                        if(control_data["type"].ToString()=="close_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.close_app);
+                        if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
+                        if(control_data["type"].ToString()=="send_text") this.Show_edit_control(index,CONTROL_ADB_TYPE.send_text);
+                        if(control_data["type"].ToString()=="swipe") this.Show_edit_control(index,CONTROL_ADB_TYPE.swipe);
+                    });
+                }
+
 
                 Carrot_Box_Btn_Item btn_del=cr_item.create_item();
                 btn_del.set_icon_color(Color.white);
@@ -390,17 +407,21 @@ public class ADB_Editor : MonoBehaviour
 
             Carrot_Box_Item inp_x2=this.Add_field_number("Position x2","Position x2 mouse and tap");
             if(data_control["x2"]!=null)
-                inp_x2.set_val(data_control["x1"].ToString());
+                inp_x2.set_val(data_control["x2"].ToString());
             else
                 inp_x2.set_val("0");
 
             Carrot_Box_Item inp_y2=this.Add_field_number("Position y2","Position y2 mouse and tap");
             if(data_control["y2"]!=null)
-                inp_y2.set_val(data_control["y1"].ToString());
+                inp_y2.set_val(data_control["y2"].ToString());
             else
                 inp_y2.set_val("0");
 
             Carrot_Box_Item inp_timer_ms=this.Add_field_number("Timer ms","Time to perform the operation");
+            if(data_control["timer"]!=null)
+                inp_timer_ms.set_val(data_control["timer"].ToString());
+            else
+                inp_timer_ms.set_val("100");
 
             Carrot_Box_Item inp_tip=this.Add_field_tip();
             btn_Panel=this.box.create_panel_btn();
@@ -416,6 +437,7 @@ public class ADB_Editor : MonoBehaviour
                 data_control["x2"]=inp_x2.get_val();
                 data_control["y2"]=inp_y2.get_val();
                 data_control["tip"]=inp_tip.get_val();
+                data_control["timer"]=inp_timer_ms.get_val();
                 if(index!=-1)
                     this.list_command[index]=data_control;
                 else
@@ -449,6 +471,13 @@ public class ADB_Editor : MonoBehaviour
             this.list_command= (IList) Carrot.Json.Deserialize(FileBrowserHelpers.ReadTextFromFile(s_path));
             this.Update_list_ui();
         });
+    }
+
+    public void Add_item_for_list(CONTROL_ADB_TYPE type,string s_tip="Control ADB"){
+        IDictionary data_control=(IDictionary) Json.Deserialize("{}");
+        data_control["type"]=type.ToString();
+        data_control["tip"]=s_tip;
+        this.list_command.Add(data_control);
     }
 
     public void Play_all_comand(){

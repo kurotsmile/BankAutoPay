@@ -24,7 +24,7 @@ public class ADB_List_task : MonoBehaviour
 
     public void On_Show(){
         this.panel_btn.SetActive(true);
-        this.Update_list_ui();
+        this.Update_ui_btn_play();
     }
 
     public void Close_task_list(){
@@ -48,12 +48,13 @@ public class ADB_List_task : MonoBehaviour
                 var index=count_line;
                 this.list_task.Add(line);
                 Carrot_Box_Item box_item=this.app.Add_item_main();
-                box_item.set_title("App "+(count_line+1));
+                box_item.set_title("App "+count_line);
                 box_item.txt_name.color=Color.white;
                 box_item.set_tip(line);
                 box_item.set_icon_white(this.app.cr.icon_carrot_app);
                 box_item.set_act(()=>{
                     this.index_cur_task=index;
+                    this.app.txt_status_app.text="Select app index:"+index;
                 });
                 if(count_line%2==0) box_item.GetComponent<Image>().color=this.app.color_colum_a;
                 count_line++;
@@ -104,6 +105,7 @@ public class ADB_List_task : MonoBehaviour
         if(this.list_task.Count>0){
             Carrot_Box_Item item_box_cur=this.app.tr_all_item.GetChild(this.index_cur_task).GetComponent<Carrot_Box_Item>();
             item_box_cur.img_icon.color=Color.yellow;
+            item_box_cur.txt_name.color=Color.yellow;
         }
     }
 
@@ -114,6 +116,31 @@ public class ADB_List_task : MonoBehaviour
         }else{
             this.img_btn_play.sprite=this.app.sp_icon_start;
             this.txt_btn_play.text="Start";
+        }
+    }
+
+    public void Save_File_List_App(){
+        this.app.file.Save_file(pasths=>{
+            string s_path=pasths[0];
+            this.SaveListToFile(s_path);
+        });
+    }
+
+    private void SaveListToFile(string filePath)
+    {
+        try
+        {
+            using (System.IO.StreamWriter writer = new System.IO.StreamWriter(filePath))
+            {
+                foreach (string line in this.list_task)
+                {
+                    writer.WriteLine(line);
+                }
+            }
+        }
+        catch (System.IO.IOException e)
+        {
+            Debug.LogError("Error save file: " + e.Message);
         }
     }
 }

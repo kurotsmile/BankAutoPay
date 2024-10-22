@@ -60,6 +60,11 @@ public class ADB_Control : MonoBehaviour
                     this.timer_step_waiting=this.timer_step_length;
                     this.is_timer_waiting=false;
                 }
+
+                if(this.index_comand_cur>=this.list_command.Count){
+                    this.On_Stop();
+                    act_done?.Invoke();
+                }
                 IDictionary data_item=(IDictionary) this.list_command[this.index_comand_cur];
 
                 if(data_item["type"].ToString()=="mouse_click") this.On_Mouse_Click(data_item["x"].ToString(),data_item["y"].ToString());
@@ -70,13 +75,11 @@ public class ADB_Control : MonoBehaviour
 
                 if(data_item["type"].ToString()=="send_text") this.On_Send_Text(data_item["text"].ToString());
                 if(data_item["type"].ToString()=="open_app") this.On_Open_App(data_item["id_app"].ToString());
+                if(data_item["type"].ToString()=="close_app") this.On_Stop_App(data_item["id_app"].ToString());
+                if(data_item["type"].ToString()=="swipe") this.On_Swipe(data_item["x1"].ToString(),data_item["y1"].ToString(),data_item["x2"].ToString(),data_item["y2"].ToString(),int.Parse(data_item["timer"].ToString()));
 
                 this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
-                if(this.index_comand_cur>=this.list_command.Count){
-                    this.On_Stop();
-                    act_done?.Invoke();
-                }
                 Debug.Log("Done Step");
             }
         }
@@ -152,6 +155,18 @@ public class ADB_Control : MonoBehaviour
             for(int i=0;i<this.list_id_devices.Count;i++){
                 string id_device=this.list_id_devices[i];
                 this.RunADBCommand("adb -s "+id_device+" shell am force-stop "+packageName);
+            }
+        }
+    }
+
+    public void On_stop_all_app(){
+        this.app.txt_status_app.text="Close all app!";
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell am kill-all");
+        }else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb -s "+id_device+" shell am kill-all");
             }
         }
     }
