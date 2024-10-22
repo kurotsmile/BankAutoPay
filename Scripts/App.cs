@@ -109,4 +109,15 @@ public class App : MonoBehaviour
     public void Btn_show_list_app(){
         this.adb.Get_list_app();
     }
+
+    public Carrot_Box_Item Add_item_main(){
+        GameObject obj_item=Instantiate(this.item_box_prefab);
+        obj_item.transform.SetParent(this.tr_all_item);
+        obj_item.transform.localScale=new Vector3(1f,1f,1f);
+        obj_item.transform.localPosition=new Vector3(1f,1f,1f);
+        Carrot_Box_Item box_item=obj_item.GetComponent<Carrot_Box_Item>();
+        obj_item.GetComponent<Image>().color=this.color_colum_b;
+        box_item.check_type();
+        return box_item;
+    }
 }

@@ -3788,9 +3788,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1667508233}
-        m_TargetAssemblyTypeName: ADB_Editor, Assembly-CSharp
-        m_MethodName: On_Open
+      - m_Target: {fileID: 1667508234}
+        m_TargetAssemblyTypeName: ADB_List_task, Assembly-CSharp
+        m_MethodName: Open_file_tastk_app
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
