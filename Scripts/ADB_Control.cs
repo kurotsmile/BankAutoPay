@@ -74,9 +74,8 @@ public class ADB_Control : MonoBehaviour
                 this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
                 if(this.index_comand_cur>=this.list_command.Count){
-                    act_done?.Invoke();
-                    this.index_comand_cur=0;
                     this.On_Stop();
+                    act_done?.Invoke();
                 }
                 Debug.Log("Done Step");
             }
@@ -84,6 +83,7 @@ public class ADB_Control : MonoBehaviour
     }
 
     public void On_Stop(){
+        this.slider_process_length.value=0;
         this.is_play=false;
     }
 

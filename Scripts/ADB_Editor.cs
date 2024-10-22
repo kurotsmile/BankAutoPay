@@ -443,6 +443,7 @@ public class ADB_Editor : MonoBehaviour
     }
 
     public void On_Open(){
+        this.app.file.Set_filter(Carrot_File_Data.JsonData);
         this.app.file.Open_file(paths=>{
             string s_path=paths[0];
             this.list_command= (IList) Carrot.Json.Deserialize(FileBrowserHelpers.ReadTextFromFile(s_path));
