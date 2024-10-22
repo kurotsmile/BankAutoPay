@@ -28,6 +28,14 @@ public class ADB_Editor : MonoBehaviour
     private IList list_command;
 
     private Carrot_Box box=null;
+    private Carrot_Window_Input box_inp=null;
+    
+    private int length_method=0;
+
+    public void On_Load(){
+        this.panel_btn.SetActive(false);
+        this.length_method=PlayerPrefs.GetInt("length_method",0);
+    }
 
     public void Show_Editor(){
         this.list_command=(IList) Carrot.Json.Deserialize("[]");
@@ -39,50 +47,48 @@ public class ADB_Editor : MonoBehaviour
     }
 
     private void Load_Menu_Right(){
-        this.Item_Left("Add Mouse click","Add position x,y click",this.sp_icon_mouse).set_act(()=>{
+        this.app.Add_Item_Right("Add Mouse click","Add position x,y click",this.sp_icon_mouse).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.mouse_click);
         });
 
-        this.Item_Left("Open The App","Open the application with the package name",this.sp_icon_open_app).set_act(()=>{
+        this.app.Add_Item_Right("Open The App","Open the application with the package name",this.sp_icon_open_app).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.open_app);
         });
 
-        this.Item_Left("Close The App","Close the application with the package name",this.sp_icon_close_app).set_act(()=>{
+        this.app.Add_Item_Right("Close The App","Close the application with the package name",this.sp_icon_close_app).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.close_app);
         });
 
-        this.Item_Left("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
+        this.app.Add_Item_Right("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.waiting);
         });
 
-        this.Item_Left("Send Text","Send Text to Device as Clipboard",this.sp_icon_send_text).set_act(()=>{
+        this.app.Add_Item_Right("Send Text","Send Text to Device as Clipboard",this.sp_icon_send_text).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
         });
 
-        this.Item_Left("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
+        this.app.Add_Item_Right("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.swipe);
         });
 
-        this.Item_Left("Stop all applications","Stop all user applications excluding system applications",this.sp_icon_stop_all).set_act(()=>{
+        this.app.Add_Item_Right("Stop all applications","Stop all user applications excluding system applications",this.sp_icon_stop_all).set_act(()=>{
             this.Add_item_for_list(CONTROL_ADB_TYPE.close_all_app,"Stop all applications");
             this.Update_list_ui();
         });
     }
 
-    private Carrot_Box_Item Item_Left(string s_title,string s_tip,Sprite s_icon){
-        GameObject obj_item=Instantiate(this.app.item_box_prefab);
-        obj_item.transform.SetParent(this.app.tr_all_item_right);
-        obj_item.transform.localPosition=new Vector3(1f,1f,1f);
-        obj_item.transform.localScale=new Vector3(1f,1f,1f);
-
-        Carrot_Box_Item item_box=obj_item.GetComponent<Carrot_Box_Item>();
-        item_box.set_icon_white(s_icon);
-        item_box.set_title(s_title);
-        item_box.set_tip(s_tip);
-        item_box.txt_name.color=Color.white;
-        item_box.GetComponent<Image>().color=this.app.color_colum_a;
-        item_box.check_type();
-        return item_box;
+    public void Load_Method_Menu_Right(){
+        this.app.cr.clear_contain(this.app.tr_all_item_right);
+        for(int i=0;i<=this.length_method;i++){
+            var index=i;
+            string s_name=PlayerPrefs.GetString("m_"+i+"_name");
+            Carrot_Box_Item item_m=this.app.Add_Item_Right(s_name,"Method",this.app.cr.icon_carrot_advanced);
+            item_m.set_act(()=>{
+                this.Show_Editor();
+                this.list_command= (IList) Carrot.Json.Deserialize(PlayerPrefs.GetString("m_"+index+"_data"));
+                this.Update_list_ui();
+            });
+        }
     }
 
     public void Save_data_json_control(){
@@ -90,6 +96,27 @@ public class ADB_Editor : MonoBehaviour
             string s_path=paths[0];
             FileBrowserHelpers.WriteTextToFile(s_path,Carrot.Json.Serialize(this.list_command));
         });
+    }
+
+    public void Save_function(){
+        if(this.list_command.Count==0){
+            this.app.cr.Show_msg("Save method","Please create the command lines before saving the method!",Msg_Icon.Alert);
+            return;
+        }
+
+        this.box_inp=this.app.cr.Show_input("Save method","Enter the method name you want to save for future use.");
+        box_inp.set_act_done(val=>{
+            this.Add_method(val,Json.Serialize(this.list_command));
+            this.app.cr.Show_msg("Save method","Save success!",Msg_Icon.Success);
+            this.box_inp.close();
+        });
+    }
+
+    private void Add_method(string s_name,string s_data){
+        PlayerPrefs.SetString("m_"+this.length_method+"_name",s_name);
+        PlayerPrefs.SetString("m_"+this.length_method+"_data",s_data);
+        this.length_method++;
+        PlayerPrefs.SetInt("length_method",this.length_method);
     }
 
     public void Update_list_ui(){
@@ -462,6 +489,7 @@ public class ADB_Editor : MonoBehaviour
     public void Close_Editor(){
         this.panel_btn.SetActive(false);
         this.app.cr.play_sound_click();
+        this.Load_Method_Menu_Right();
     }
 
     public void On_Open(){

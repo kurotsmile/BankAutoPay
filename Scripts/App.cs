@@ -27,21 +27,21 @@ public class App : MonoBehaviour
     public Text txt_btn_start;
     public Image img_icon_btn_start;
 
-    [Header("Bank")]
-    public Bank_Item[] bank_items;
-
     [Header("Asset")]
     public Sprite sp_icon_start;
     public Sprite sp_icon_stop;
-    private int index_sel_bank;
 
     void Start()
     {
         this.cr.Load_Carrot();
-        this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
-        this.Update_ui_list_bank();
-        if(this.is_load_banck) this.bankcl.On_Load();
         this.adb_tasks.On_Load();
+        this.adb_editor.On_Load();
+
+        if(this.is_load_banck) 
+            this.bankcl.On_Load();
+        else
+            this.adb_editor.Load_Method_Menu_Right();
+
     }
 
     public void Quit_App()
@@ -67,18 +67,6 @@ public class App : MonoBehaviour
         this.adb.RunCommandWithMemu("start");
     }
 
-    private void Update_ui_list_bank(){
-        for(int i=0;i<this.bank_items.Length;i++) this.bank_items[i].img_bk.color=this.color_nomal;
-        this.bank_items[this.index_sel_bank].img_bk.color=this.color_sel;
-    }
-
-    public void Select_bank(int index){
-        PlayerPrefs.SetInt("index_sel_bank",index);
-        this.index_sel_bank=index;
-        this.Update_ui_list_bank();
-        this.cr.play_sound_click();
-    }
-
     public void Btn_start_auto(){
         if(this.adb.get_status()){
             this.adb.is_memu=false;
@@ -87,7 +75,6 @@ public class App : MonoBehaviour
             this.img_icon_btn_start.sprite=this.sp_icon_start;
         }else{
             this.adb.is_memu=true;
-            this.adb.On_Start(this.bank_items[this.index_sel_bank].name_file_macro);
             this.txt_btn_start.text="Stop";
             this.img_icon_btn_start.sprite=this.sp_icon_stop;
         }
@@ -119,5 +106,21 @@ public class App : MonoBehaviour
         obj_item.GetComponent<Image>().color=this.color_colum_b;
         box_item.check_type();
         return box_item;
+    }
+
+    public Carrot_Box_Item Add_Item_Right(string s_title,string s_tip,Sprite s_icon){
+        GameObject obj_item=Instantiate(this.item_box_prefab);
+        obj_item.transform.SetParent(this.tr_all_item_right);
+        obj_item.transform.localPosition=new Vector3(1f,1f,1f);
+        obj_item.transform.localScale=new Vector3(1f,1f,1f);
+
+        Carrot_Box_Item item_box=obj_item.GetComponent<Carrot_Box_Item>();
+        item_box.set_icon_white(s_icon);
+        item_box.set_title(s_title);
+        item_box.set_tip(s_tip);
+        item_box.txt_name.color=Color.white;
+        item_box.GetComponent<Image>().color=this.color_colum_a;
+        item_box.check_type();
+        return item_box;
     }
 }

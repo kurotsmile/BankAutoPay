@@ -9,10 +9,19 @@ public class BankCL : MonoBehaviour
 {
     [Header("Main Obj")]
     public App app;
+
+    [Header("Bank")]
+    public Bank_Item[] bank_items;
+    private int index_sel_bank;
+
     private DatabaseReference databaseRef;
     private FirebaseApp customApp;
+
+
     public void On_Load(){
         this.Load_config_app();
+        this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
+        this.Update_ui_list_bank();
     }
 
     public void Load_config_app(){
@@ -46,6 +55,12 @@ public class BankCL : MonoBehaviour
             Debug.Log("App da duoc tao!");
         } 
     }
+
+    private void Update_ui_list_bank(){
+        for(int i=0;i<this.bank_items.Length;i++) this.bank_items[i].img_bk.color=this.app.color_nomal;
+        this.bank_items[this.index_sel_bank].img_bk.color=this.app.color_sel;
+    }
+
 
     void ReadDataFromFirebase()
     {
@@ -133,5 +148,13 @@ public class BankCL : MonoBehaviour
         } else {
             FirebaseDatabase.DefaultInstance.GoOnline();
          }
+    }
+
+    
+    public void Select_bank(int index){
+        PlayerPrefs.SetInt("index_sel_bank",index);
+        this.index_sel_bank=index;
+        this.Update_ui_list_bank();
+        this.app.cr.play_sound_click();
     }
 }

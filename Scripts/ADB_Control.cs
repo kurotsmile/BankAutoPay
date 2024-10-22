@@ -30,11 +30,6 @@ public class ADB_Control : MonoBehaviour
     private List<string> list_id_devices;
     private UnityAction act_done;
 
-    public void On_Start(string filePath){
-        this.index_comand_cur=0;
-        this.is_play=true;
-    }
-
     public void On_Play(IList list_cmd,UnityAction act_done=null){
         this.list_command=list_cmd;
         this.slider_process_length.maxValue=list_cmd.Count;
