@@ -54,7 +54,7 @@ public class ADB_Editor : MonoBehaviour
         });
 
         this.Item_Left("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.swipe);
         });
     }
 
@@ -121,6 +121,12 @@ public class ADB_Editor : MonoBehaviour
                     cr_item.set_tip("Text:"+control_data["text"].ToString());
                 }
 
+                if(control_data["type"].ToString()=="swipe"){
+                    cr_item.set_icon_white(this.sp_icon_swipe);
+                    cr_item.set_title("Swipe");
+                    cr_item.set_tip("Move To :"+control_data["x"].ToString());
+                }
+
                 cr_item.check_type();
                 cr_item.txt_name.color=Color.white;
                 cr_item.set_act(()=>{
@@ -137,6 +143,7 @@ public class ADB_Editor : MonoBehaviour
                     if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
                     if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
                     if(control_data["type"].ToString()=="send_text") this.Show_edit_control(index,CONTROL_ADB_TYPE.send_text);
+                    if(control_data["type"].ToString()=="swipe") this.Show_edit_control(index,CONTROL_ADB_TYPE.swipe);
                 });
 
                 Carrot_Box_Btn_Item btn_del=cr_item.create_item();
@@ -150,19 +157,33 @@ public class ADB_Editor : MonoBehaviour
         }
     }
 
+    private Carrot_Box_Item Add_field_number(string s_title,string s_tip){
+        Carrot.Carrot_Box_Item inp_number=this.box.create_item("inp_x");
+        inp_number.set_title(s_title);
+        inp_number.set_tip(s_tip);
+        inp_number.set_icon(this.app.cr.icon_carrot_write);
+        inp_number.set_type(Carrot.Box_Item_Type.box_number_input);
+        return inp_number;
+    }
+
+    private Carrot_Box_Item Add_field_tip(){
+        Carrot.Carrot_Box_Item inp_note=this.box.create_item("inp_note");
+        inp_note.set_title("Note");
+        inp_note.set_tip("Write a short description of this action to help you remember it.");
+        inp_note.set_icon(this.app.cr.icon_carrot_write);
+        inp_note.set_type(Carrot.Box_Item_Type.box_value_input);
+        return inp_note;
+    }
+
     private void Show_edit_control(int index,CONTROL_ADB_TYPE type){
         if(this.box!=null) this.box.close();
 
         IDictionary data_control=null;
-        if(index!=-1){
+        if(index!=-1)
             data_control=(IDictionary)this.list_command[index];
-        }
-        else{
-            data_control=(IDictionary) Carrot.Json.Deserialize("{}");
-            data_control["x"]=0;
-            data_control["y"]=0;
-            data_control["type"]=type.ToString();
-        }
+        else
+            data_control=(IDictionary) Json.Deserialize("{}");
+        data_control["type"]=type.ToString();
 
         this.box=this.app.cr.Create_Box("box_control_edit");
         Carrot_Box_Btn_Panel btn_Panel=null;
@@ -172,20 +193,19 @@ public class ADB_Editor : MonoBehaviour
                 this.box.set_title("Add Mouse Click");
             else
                 this.box.set_title("Update Mouse Click");
-            Carrot.Carrot_Box_Item inp_x=this.box.create_item("inp_x");
-            inp_x.set_title("Position x");
-            inp_x.set_tip("Position x mouse and tap");
-            inp_x.set_icon(this.app.cr.icon_carrot_write);
-            inp_x.set_type(Carrot.Box_Item_Type.box_number_input);
-            inp_x.set_val(data_control["x"].ToString());
+            Carrot_Box_Item inp_x=this.Add_field_number("Position x","Position x mouse and tap");
+            if(data_control["x"]!=null)
+                inp_x.set_val(data_control["x"].ToString());
+            else
+                inp_x.set_val("0");
 
-            Carrot.Carrot_Box_Item inp_y=this.box.create_item("inp_x");
-            inp_y.set_title("Position Y");
-            inp_y.set_tip("Position Y mouse and tap");
-            inp_y.set_icon(this.app.cr.icon_carrot_write);
-            inp_y.set_type(Carrot.Box_Item_Type.box_number_input);
-            inp_y.set_val(data_control["y"].ToString());
+            Carrot_Box_Item inp_y=this.Add_field_number("Position y","Position y mouse and tap");
+            if(data_control["y"]!=null)
+                inp_y.set_val(data_control["y"].ToString());
+            else
+                inp_y.set_val("0");
 
+            Carrot_Box_Item inp_tip=this.Add_field_tip();
             btn_Panel=this.box.create_panel_btn();
 
             Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
@@ -196,7 +216,7 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_act_click(()=>{
                 data_control["x"]=inp_x.get_val();
                 data_control["y"]=inp_y.get_val();
-                data_control["type"]=type.ToString();
+                data_control["tip"]=inp_tip.get_val();
                 if(index!=-1)
                     this.list_command[index]=data_control;
                 else
@@ -293,6 +313,63 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["text"]=inp_text.get_val();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
+
+        if(type==CONTROL_ADB_TYPE.swipe){
+            this.box.set_icon(this.sp_icon_swipe);
+            if(index==-1)
+                this.box.set_title("Add Swipe");
+            else
+                this.box.set_title("Update Swipe");
+
+            Carrot_Box_Item inp_x1=this.Add_field_number("Position x1","Position x1 mouse and tap");
+            if(data_control["x1"]!=null)
+                inp_x1.set_val(data_control["x1"].ToString());
+            else
+                inp_x1.set_val("0");
+
+            Carrot_Box_Item inp_y1=this.Add_field_number("Position y1","Position y1 mouse and tap");
+            if(data_control["y1"]!=null)
+                inp_y1.set_val(data_control["y1"].ToString());
+            else
+                inp_y1.set_val("0");
+
+            Carrot_Box_Item inp_x2=this.Add_field_number("Position x2","Position x2 mouse and tap");
+            if(data_control["x2"]!=null)
+                inp_x2.set_val(data_control["x1"].ToString());
+            else
+                inp_x2.set_val("0");
+
+            Carrot_Box_Item inp_y2=this.Add_field_number("Position y2","Position y2 mouse and tap");
+            if(data_control["y2"]!=null)
+                inp_y2.set_val(data_control["y1"].ToString());
+            else
+                inp_y2.set_val("0");
+
+            Carrot_Box_Item inp_timer_ms=this.Add_field_number("Timer ms","Time to perform the operation");
+
+            Carrot_Box_Item inp_tip=this.Add_field_tip();
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["x1"]=inp_x1.get_val();
+                data_control["y1"]=inp_y1.get_val();
+                data_control["x2"]=inp_x2.get_val();
+                data_control["y2"]=inp_y2.get_val();
+                data_control["tip"]=inp_tip.get_val();
                 if(index!=-1)
                     this.list_command[index]=data_control;
                 else

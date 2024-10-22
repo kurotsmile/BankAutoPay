@@ -10,6 +10,7 @@ public class ADB_Control : MonoBehaviour
 
     [Header("Main Obj")]
     public App app;
+    public bool is_memu=false;
 
     [Header("UI")]
     public Slider slider_process_length;
@@ -24,6 +25,8 @@ public class ADB_Control : MonoBehaviour
     private float timer_step_length=2;
     private bool is_play=false;
     private bool is_timer_waiting=false;
+
+    private List<string> list_id_devices;
 
     public void On_Start(string filePath){
         this.index_comand_cur=0;
@@ -84,17 +87,53 @@ public class ADB_Control : MonoBehaviour
 
     public void On_Mouse_Click(string x,string y){
         this.app.txt_status_app.text="Tap x:"+x+" , y:"+y;
-        this.RunCommandWithMemu("adb shell input tap "+x+" "+y);
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell input tap "+x+" "+y);
+        }
+        else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb -s "+id_device+" shell input tap "+x+" "+y);
+            }
+        }
     }
 
     public void On_Send_Text(string s_text){
         this.app.txt_status_app.text="Send Text:"+s_text;
-        this.RunCommandWithMemu("adb shell input text \""+s_text+"\"");
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell input text \""+s_text+"\"");
+        }else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb -s "+id_device+" shell input text \""+s_text+"\"");
+            }
+        }
     }
 
     public void On_Swipe(string x1,string y1,string x2,string y2,int timer_ms){
         this.app.txt_status_app.text="Swipe "+x1+","+y1+" -> "+x2+","+y2;
-        this.RunCommandWithMemu("adb shell shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+        }
+        else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb -s "+id_device+" shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+            }
+        }
+    }
+
+    public void On_Open_App(string id_app){
+        this.app.txt_status_app.text="Open app "+id_app;
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell monkey -p "+id_app+" -v 1");
+        }
+        else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb shell monkey -p "+id_app+" -v 1");
+            }
+        }
     }
 
     public void RunCommandWithMemu(string s_command,UnityAction<string> act_done=null)
@@ -127,16 +166,8 @@ public class ADB_Control : MonoBehaviour
         process.WaitForExit();
         Act_done?.Invoke(output);
     }
-    
-    [ContextMenu("Act_Get_list_Devices")]
-    public void Act_Get_list_Devices(){
-        this.RunCommandWithMemu("adb devices",s_list=>{
-            this.app.cr.Show_msg(s_list);
-            Debug.Log(s_list);
-        });
-    }
 
-    public void ListConnectedDevices(UnityAction<List<string>> Act_done)
+    private void ListConnectedDevices(UnityAction<List<string>> Act_done)
     {
         string adbDevicesCommand = "adb devices";
         this.RunADBCommand(adbDevicesCommand,output=>{
@@ -166,16 +197,40 @@ public class ADB_Control : MonoBehaviour
             box_devices.set_title("List Devices");
             box_devices.set_icon(this.sp_icon_devices);
 
-            if(list.Count>=1){
+            List<string> list_device=new();
+            if(list.Count>=0){
                 for(int i=0;i<list.Count;i++){
-                    Carrot_Box_Item device_item=box_devices.create_item("item_device");
-                    device_item.set_title(list[i]);
-                    device_item.set_tip("Device Android");
-                    device_item.set_icon(this.app.cr.icon_carrot_app);
+                    if(list[i].Trim()!="List of devices attached"){
+                        Carrot_Box_Item device_item=box_devices.create_item("item_device");
+                        device_item.set_title(list[i]);
+                        device_item.set_tip("Device Android");
+                        device_item.set_icon(this.app.cr.icon_carrot_app);
+                        list_device.Add(list[i]);
+                    }
                 }
             }
+            Carrot_Box_Btn_Panel btn_Panel=box_devices.create_panel_btn();
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                this.list_id_devices=list_device;
+                box_devices.close();
+                this.app.cr.play_sound_click();
+            });
 
-        });
+            Carrot_Button_Item btn_cancel=btn_Panel.create_btn("btn_cancel");
+            btn_cancel.set_bk_color(this.app.cr.color_highlight);
+            btn_cancel.set_label("Cancel");
+            btn_cancel.set_label_color(Color.white);
+            btn_cancel.set_icon_white(this.app.cr.icon_carrot_cancel);
+            btn_cancel.set_act_click(()=>{
+                box_devices.close();
+                this.app.cr.play_sound_click();
+            });
+            });
     }
 
 }

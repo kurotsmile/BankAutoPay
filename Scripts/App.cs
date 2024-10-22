@@ -60,6 +60,7 @@ public class App : MonoBehaviour
     }
 
     public void Btn_start_Memu(){
+        this.adb.is_memu=true;
         this.txt_status_app.text="Memu emulator launched";
         this.adb.RunCommandWithMemu("start");
     }
@@ -78,10 +79,12 @@ public class App : MonoBehaviour
 
     public void Btn_start_auto(){
         if(this.adb.get_status()){
+            this.adb.is_memu=false;
             this.adb.On_Stop();
             this.txt_btn_start.text="Start";
             this.img_icon_btn_start.sprite=this.sp_icon_start;
         }else{
+            this.adb.is_memu=true;
             this.adb.On_Start(this.bank_items[this.index_sel_bank].name_file_macro);
             this.txt_btn_start.text="Stop";
             this.img_icon_btn_start.sprite=this.sp_icon_stop;
@@ -90,6 +93,7 @@ public class App : MonoBehaviour
     }
 
     public void Btn_stop_memu(){
+        this.adb.is_memu=false;
         this.adb.RunCommandWithMemu("stop");
         this.cr.play_sound_click();
     }
