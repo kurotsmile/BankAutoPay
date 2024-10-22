@@ -15,6 +15,7 @@ public class App : MonoBehaviour
     public Color32 color_colum_b;
     public ADB_Control adb;
     public ADB_Editor adb_editor;
+    public ADB_List_task adb_tasks;
     public Carrot.Carrot cr;
     public Carrot_File file;
     public GameObject item_box_prefab;
@@ -40,6 +41,7 @@ public class App : MonoBehaviour
         this.index_sel_bank=PlayerPrefs.GetInt("index_sel_bank",0);
         this.Update_ui_list_bank();
         if(this.is_load_banck) this.bankcl.On_Load();
+        this.adb_tasks.On_Load();
     }
 
     public void Quit_App()
@@ -102,5 +104,9 @@ public class App : MonoBehaviour
         this.file.Set_filter(Carrot_File_Data.JsonData);
         this.adb_editor.Save_data_json_control();
         this.cr.play_sound_click();
+    }
+
+    public void Btn_show_list_app(){
+        this.adb.Get_list_app();
     }
 }

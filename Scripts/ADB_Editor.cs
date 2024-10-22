@@ -5,7 +5,7 @@ using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum CONTROL_ADB_TYPE{mouse_click,open_app,send_text,waiting,swipe}
+public enum CONTROL_ADB_TYPE{mouse_click,open_app,close_app,send_text,waiting,swipe}
 public class ADB_Editor : MonoBehaviour
 {
     [Header("Obj Main")]
@@ -19,6 +19,7 @@ public class ADB_Editor : MonoBehaviour
     [Header("Asset")]
     public Sprite sp_icon_mouse;
     public Sprite sp_icon_open_app;
+    public Sprite sp_icon_close_app;
     public Sprite sp_icon_waiting;
     public Sprite sp_icon_send_text;
     public Sprite sp_icon_swipe;
@@ -43,6 +44,10 @@ public class ADB_Editor : MonoBehaviour
 
         this.Item_Left("Open The App","Open the application with the package name",this.sp_icon_open_app).set_act(()=>{
             this.Show_edit_control(-1,CONTROL_ADB_TYPE.open_app);
+        });
+
+        this.Item_Left("Close The App","Close the application with the package name",this.sp_icon_close_app).set_act(()=>{
+            this.Show_edit_control(-1,CONTROL_ADB_TYPE.close_app);
         });
 
         this.Item_Left("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
@@ -109,6 +114,12 @@ public class ADB_Editor : MonoBehaviour
                     cr_item.set_tip("App id:"+control_data["id_app"].ToString());
                 }
 
+                if(control_data["type"].ToString()=="close_app"){
+                    cr_item.set_icon_white(this.sp_icon_close_app);
+                    cr_item.set_title("Close App");
+                    cr_item.set_tip("App id:"+control_data["id_app"].ToString());
+                }
+
                 if(control_data["type"].ToString()=="waiting"){
                     cr_item.set_icon_white(this.sp_icon_waiting);
                     cr_item.set_title("Waiting");
@@ -132,6 +143,8 @@ public class ADB_Editor : MonoBehaviour
                 cr_item.set_act(()=>{
                     if(control_data["type"].ToString()=="mouse_click") this.app.adb.On_Mouse_Click(control_data["x"].ToString(),control_data["y"].ToString());
                     if(control_data["type"].ToString()=="send_text") this.app.adb.On_Send_Text(control_data["text"].ToString());
+                    if(control_data["type"].ToString()=="open_app") this.app.adb.On_Open_App(control_data["id_app"].ToString());
+                    if(control_data["type"].ToString()=="close_app") this.app.adb.On_Stop_App(control_data["id_app"].ToString());
                 });
 
                 Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
@@ -141,6 +154,7 @@ public class ADB_Editor : MonoBehaviour
                 btn_edit.set_act(()=>{
                     if(control_data["type"].ToString()=="mouse_click") this.Show_edit_control(index,CONTROL_ADB_TYPE.mouse_click);
                     if(control_data["type"].ToString()=="open_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.open_app);
+                    if(control_data["type"].ToString()=="close_app") this.Show_edit_control(index,CONTROL_ADB_TYPE.close_app);
                     if(control_data["type"].ToString()=="waiting") this.Show_edit_control(index,CONTROL_ADB_TYPE.waiting);
                     if(control_data["type"].ToString()=="send_text") this.Show_edit_control(index,CONTROL_ADB_TYPE.send_text);
                     if(control_data["type"].ToString()=="swipe") this.Show_edit_control(index,CONTROL_ADB_TYPE.swipe);
@@ -236,6 +250,38 @@ public class ADB_Editor : MonoBehaviour
             Carrot.Carrot_Box_Item inp_id_app=this.box.create_item("id_app");
             inp_id_app.set_title("Application Package Name (Application ID)");
             inp_id_app.set_tip("Enter the application name and main startup function");
+            inp_id_app.set_icon(this.app.cr.icon_carrot_write);
+            inp_id_app.set_type(Carrot.Box_Item_Type.box_value_input);
+            if(data_control["id_app"]!=null) inp_id_app.set_val(data_control["id_app"].ToString());
+
+            btn_Panel=this.box.create_panel_btn();
+
+            Carrot_Button_Item btn_done=btn_Panel.create_btn("btn_done");
+            btn_done.set_bk_color(this.app.cr.color_highlight);
+            btn_done.set_label("Done");
+            btn_done.set_label_color(Color.white);
+            btn_done.set_icon_white(this.app.cr.icon_carrot_done);
+            btn_done.set_act_click(()=>{
+                data_control["id_app"]=inp_id_app.get_val();
+                if(index!=-1)
+                    this.list_command[index]=data_control;
+                else
+                    this.list_command.Add(data_control);
+                this.box.close();
+                this.app.cr.play_sound_click();
+                this.Update_list_ui();
+            });
+        }
+
+        if(type==CONTROL_ADB_TYPE.close_app){
+            this.box.set_icon(this.sp_icon_close_app);
+            if(index==-1)
+                this.box.set_title("Add Close App");
+            else
+                this.box.set_title("Update Close App");
+            Carrot.Carrot_Box_Item inp_id_app=this.box.create_item("id_app");
+            inp_id_app.set_title("Application Package Name (Application ID)");
+            inp_id_app.set_tip("Enter the application name and main closeup function");
             inp_id_app.set_icon(this.app.cr.icon_carrot_write);
             inp_id_app.set_type(Carrot.Box_Item_Type.box_value_input);
             if(data_control["id_app"]!=null) inp_id_app.set_val(data_control["id_app"].ToString());

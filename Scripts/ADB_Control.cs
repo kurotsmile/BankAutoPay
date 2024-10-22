@@ -66,6 +66,7 @@ public class ADB_Control : MonoBehaviour
                 }
 
                 if(data_item["type"].ToString()=="send_text") this.On_Send_Text(data_item["text"].ToString());
+                if(data_item["type"].ToString()=="open_app") this.On_Open_App(data_item["id_app"].ToString());
 
                 this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
@@ -132,6 +133,20 @@ public class ADB_Control : MonoBehaviour
             for(int i=0;i<this.list_id_devices.Count;i++){
                 string id_device=this.list_id_devices[i];
                 this.RunADBCommand("adb shell monkey -p "+id_app+" -v 1");
+            }
+        }
+    }
+
+    public void On_Stop_App(string packageName)
+    {
+        this.app.txt_status_app.text="Close app "+packageName;
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb shell am force-stop "+packageName);
+        }
+        else{
+            for(int i=0;i<this.list_id_devices.Count;i++){
+                string id_device=this.list_id_devices[i];
+                this.RunADBCommand("adb -s "+id_device+" shell am force-stop "+packageName);
             }
         }
     }
@@ -230,7 +245,34 @@ public class ADB_Control : MonoBehaviour
                 box_devices.close();
                 this.app.cr.play_sound_click();
             });
-            });
+        });
     }
 
+    public void Get_list_app(){
+        this.GetInstalledApps(null,datas=>{
+
+        });
+    }
+
+    public void GetInstalledApps(string deviceSerial = null,UnityAction<List<string>> action_done=null)
+    {
+        string adbCommand = deviceSerial == null 
+            ? "adb shell pm list packages"
+            : $"adb -s {deviceSerial} shell pm list packages";
+
+        this.RunADBCommand(adbCommand,s_list=>{
+            string[] lines = s_list.Split('\n');
+            List<string> appList = new();
+            foreach (string line in lines)
+            {
+                string trimmedLine = line.Trim();
+                if (!string.IsNullOrEmpty(trimmedLine) && trimmedLine.StartsWith("package:"))
+                {
+                    appList.Add(trimmedLine.Replace("package:", ""));
+                }
+            }
+            action_done?.Invoke(appList);
+        });
+
+    }
 }
