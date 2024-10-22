@@ -15,6 +15,9 @@ public class ADB_Control : MonoBehaviour
 
     [Header("UI")]
     public Slider slider_process_length;
+
+    [Header("Asset")]
+    public Sprite sp_icon_devices;
     private IList list_command;
 
     private int index_comand_cur=0;
@@ -103,10 +106,10 @@ public class ADB_Control : MonoBehaviour
         process.Start();
         string output = process.StandardOutput.ReadToEnd();
         this.app.txt_status_app.text=output;
-        if(act_done!=null) act_done(output);
+        act_done?.Invoke(output);
     }
 
-     public static string RunADBCommand(string command)
+     public void RunADBCommand(string command,UnityAction<string> Act_done=null)
     {
         System.Diagnostics.Process process = new System.Diagnostics.Process();
         process.StartInfo.FileName = "cmd.exe";
@@ -118,7 +121,7 @@ public class ADB_Control : MonoBehaviour
 
         string output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        return output;
+        Act_done?.Invoke(output);
     }
     
     [ContextMenu("Act_Get_list_Devices")]
@@ -129,29 +132,46 @@ public class ADB_Control : MonoBehaviour
         });
     }
 
-    public List<string> ListConnectedDevices()
+    public void ListConnectedDevices(UnityAction<List<string>> Act_done)
     {
         string adbDevicesCommand = "adb devices";
-        string output = RunADBCommand(adbDevicesCommand);
+        this.RunADBCommand(adbDevicesCommand,output=>{
+            string[] lines = output.Split('\n');
 
-        Debug.Log(output);
-
-        string[] lines = output.Split('\n');
-
-        List<string> deviceList = new List<string>();
-        for (int i = 1; i < lines.Length; i++)
-        {
-            string line = lines[i].Trim();
-            if (!string.IsNullOrEmpty(line) && line.Contains("device"))
+            List<string> deviceList = new List<string>();
+            for (int i = 1; i < lines.Length; i++)
             {
-                string[] parts = line.Split('\t');
-                if (parts.Length > 0)
+                string line = lines[i].Trim();
+                if (!string.IsNullOrEmpty(line) && line.Contains("device"))
                 {
-                    deviceList.Add(parts[0]);
+                    string[] parts = line.Split('\t');
+                    if (parts.Length > 0)
+                    {
+                        deviceList.Add(parts[0]);
+                    }
                 }
             }
-        }
-        return deviceList;
+
+            Act_done?.Invoke(deviceList);
+        });
+    }
+
+    public void Btn_show_list_devices(){
+        this.ListConnectedDevices(list=>{
+            Carrot_Box box_devices=this.app.cr.Create_Box();
+            box_devices.set_title("List Devices");
+            box_devices.set_icon(this.sp_icon_devices);
+
+            if(list.Count>=1){
+                for(int i=0;i<list.Count;i++){
+                    Carrot_Box_Item device_item=box_devices.create_item("item_device");
+                    device_item.set_title(list[i]);
+                    device_item.set_tip("Device Android");
+                    device_item.set_icon(this.app.cr.icon_carrot_app);
+                }
+            }
+
+        });
     }
 
 }
