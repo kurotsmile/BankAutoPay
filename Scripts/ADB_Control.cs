@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Carrot;
@@ -27,17 +28,19 @@ public class ADB_Control : MonoBehaviour
     private bool is_timer_waiting=false;
 
     private List<string> list_id_devices;
+    private UnityAction act_done;
 
     public void On_Start(string filePath){
         this.index_comand_cur=0;
         this.is_play=true;
     }
 
-    public void On_Play(IList list_cmd){
+    public void On_Play(IList list_cmd,UnityAction act_done=null){
         this.list_command=list_cmd;
         this.slider_process_length.maxValue=list_cmd.Count;
         this.slider_process_length.value=0;
         this.index_comand_cur=0;
+        this.act_done=act_done;
         if(this.list_command.Count==0){
             this.app.cr.Show_msg("No commands have been created yet!","ADB Control",Msg_Icon.Alert);
         }
@@ -71,6 +74,8 @@ public class ADB_Control : MonoBehaviour
                 this.slider_process_length.value=(this.index_comand_cur+1);
                 this.index_comand_cur++;
                 if(this.index_comand_cur>=this.list_command.Count){
+                    act_done?.Invoke();
+                    this.index_comand_cur=0;
                     this.On_Stop();
                 }
                 Debug.Log("Done Step");

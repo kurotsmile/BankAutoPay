@@ -461,4 +461,8 @@ public class ADB_Editor : MonoBehaviour
             this.app.adb.On_Play(this.list_command);
         }
     }
+
+    public IList Get_list_Command(){
+        return this.list_command;
+    }
 }
