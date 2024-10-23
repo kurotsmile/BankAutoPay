@@ -31,16 +31,19 @@ public class ADB_Control : MonoBehaviour
     private UnityAction act_done;
 
     public void On_Play(IList list_cmd,UnityAction act_done=null){
-        this.list_command=list_cmd;
-        this.slider_process_length.maxValue=list_cmd.Count;
-        this.slider_process_length.value=0;
-        this.index_comand_cur=0;
-        this.act_done=act_done;
-        if(this.list_command.Count==0){
+        if(this.list_command==null||this.list_command.Count==0){
             this.app.cr.Show_msg("No commands have been created yet!","ADB Control",Msg_Icon.Alert);
+        }
+        else if(this.list_id_devices==null||this.list_id_devices.Count==0){
+            this.app.cr.Show_msg("You have not plugged in a device to run, please select a device or emulator to continue this process!","No Devices",Msg_Icon.Alert);
         }
         else
         {
+            this.list_command=list_cmd;
+            this.slider_process_length.maxValue=list_cmd.Count;
+            this.slider_process_length.value=0;
+            this.index_comand_cur=0;
+            this.act_done=act_done;
             this.is_play=true;    
         }
     }
@@ -95,9 +98,11 @@ public class ADB_Control : MonoBehaviour
             this.RunCommandWithMemu("adb shell input tap "+x+" "+y);
         }
         else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb -s "+id_device+" shell input tap "+x+" "+y);
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb -s "+id_device+" shell input tap "+x+" "+y);
+                }
             }
         }
     }
@@ -107,9 +112,11 @@ public class ADB_Control : MonoBehaviour
         if(this.is_memu){
             this.RunCommandWithMemu("adb shell input text \""+s_text+"\"");
         }else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb -s "+id_device+" shell input text \""+s_text+"\"");
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb -s "+id_device+" shell input text \""+s_text+"\"");
+                }
             }
         }
     }
@@ -120,9 +127,11 @@ public class ADB_Control : MonoBehaviour
             this.RunCommandWithMemu("adb shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
         }
         else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb -s "+id_device+" shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb -s "+id_device+" shell input swipe "+x1+" "+y1+" "+x2+" "+y2+" "+timer_ms);
+                }
             }
         }
     }
@@ -133,9 +142,11 @@ public class ADB_Control : MonoBehaviour
             this.RunCommandWithMemu("adb shell monkey -p "+id_app+" -v 1");
         }
         else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb shell monkey -p "+id_app+" -v 1");
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb shell monkey -p "+id_app+" -v 1");
+                }
             }
         }
     }
@@ -147,9 +158,11 @@ public class ADB_Control : MonoBehaviour
             this.RunCommandWithMemu("adb shell am force-stop "+packageName);
         }
         else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb -s "+id_device+" shell am force-stop "+packageName);
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb -s "+id_device+" shell am force-stop "+packageName);
+                }
             }
         }
     }
@@ -159,10 +172,20 @@ public class ADB_Control : MonoBehaviour
         if(this.is_memu){
             this.RunCommandWithMemu("adb shell am kill-all");
         }else{
-            for(int i=0;i<this.list_id_devices.Count;i++){
-                string id_device=this.list_id_devices[i];
-                this.RunADBCommand("adb -s "+id_device+" shell am kill-all");
+            if(this.Check_devices_alive()){
+                for(int i=0;i<this.list_id_devices.Count;i++){
+                    string id_device=this.list_id_devices[i];
+                    this.RunADBCommand("adb -s "+id_device+" shell am kill-all");
+                }
             }
+        }
+    }
+
+    private bool Check_devices_alive(){
+        if(this.list_id_devices==null||this.list_id_devices.Count==0){
+            return false;
+        }else{
+            return true;
         }
     }
 
@@ -288,6 +311,9 @@ public class ADB_Control : MonoBehaviour
             }
             action_done?.Invoke(appList);
         });
+    }
 
+    public void Set_List_Command(IList list_cmd){
+        this.list_command=list_cmd;
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Carrot;
 using SimpleFileBrowser;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +32,7 @@ public class ADB_Editor : MonoBehaviour
     private Carrot_Window_Input box_inp=null;
     
     private int length_method=0;
+    private int index_sel_method=0;
 
     public void On_Load(){
         this.panel_btn.SetActive(false);
@@ -78,17 +80,54 @@ public class ADB_Editor : MonoBehaviour
     }
 
     public void Load_Method_Menu_Right(){
+        this.Update_list_ui_Method_right_menu();
+    }
+
+    private void Update_list_ui_Method_right_menu(){
         this.app.cr.clear_contain(this.app.tr_all_item_right);
         for(int i=0;i<=this.length_method;i++){
             var index=i;
+            if(PlayerPrefs.GetString("m_"+i+"_name","")=="") continue;
+            
             string s_name=PlayerPrefs.GetString("m_"+i+"_name");
             Carrot_Box_Item item_m=this.app.Add_Item_Right(s_name,"Method",this.app.cr.icon_carrot_advanced);
             item_m.set_act(()=>{
+                this.index_sel_method=index;
+                IList list_cmd= (IList) Carrot.Json.Deserialize(PlayerPrefs.GetString("m_"+index+"_data"));
+                this.app.adb.Set_List_Command(list_cmd);
+                this.Update_list_ui_Method_right_menu();
+            });
+
+            Carrot_Box_Btn_Item btn_edit=item_m.create_item();
+            btn_edit.set_icon(this.app.cr.user.icon_user_edit);
+            btn_edit.set_icon_color(Color.white);
+            btn_edit.set_color(this.app.cr.color_highlight);
+            btn_edit.set_act(()=>{
                 this.Show_Editor();
                 this.list_command= (IList) Carrot.Json.Deserialize(PlayerPrefs.GetString("m_"+index+"_data"));
                 this.Update_list_ui();
             });
+
+            Carrot_Box_Btn_Item btn_del=item_m.create_item();
+            btn_del.set_icon(this.app.cr.sp_icon_del_data);
+            btn_del.set_icon_color(Color.white);
+            btn_del.set_color(this.app.cr.color_highlight);
+            btn_del.set_act(()=>{
+                this.Delete_method(index);
+            });
+
+            if(index==this.index_sel_method){
+                item_m.GetComponent<Image>().color=this.app.color_colum_a;
+                item_m.img_icon.color=Color.yellow;
+            }
         }
+    }
+
+    private void Delete_method(int index){
+        this.list_command.RemoveAt(index);
+        PlayerPrefs.DeleteKey("m_"+index+"_data");
+        PlayerPrefs.DeleteKey("m_"+index+"_name");
+        this.Update_list_ui_Method_right_menu();
     }
 
     public void Save_data_json_control(){

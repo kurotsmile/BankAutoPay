@@ -3298,6 +3298,14 @@ PrefabInstance:
       propertyPath: color_highlight.rgba
       value: 4278219497
       objectReference: {fileID: 0}
+    - target: {fileID: 5170736565810424378, guid: 03a96ab3934df714c9f607eeba1302ab, type: 3}
+      propertyPath: id_ads_unity_App_ios
+      value: 5717948
+      objectReference: {fileID: 0}
+    - target: {fileID: 5170736565810424378, guid: 03a96ab3934df714c9f607eeba1302ab, type: 3}
+      propertyPath: id_ads_unity_App_android
+      value: 5717949
+      objectReference: {fileID: 0}
     - target: {fileID: 5170736565810424379, guid: 03a96ab3934df714c9f607eeba1302ab, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5413,17 +5421,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
   m_PrefabInstance: {fileID: 1449397715}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1449397717 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
-  m_PrefabInstance: {fileID: 1449397715}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1449797016
 GameObject:
   m_ObjectHideFlags: 0
@@ -5944,9 +5941,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1667508230}
-        m_TargetAssemblyTypeName: App, Assembly-CSharp
-        m_MethodName: load_config_app
+      - m_Target: {fileID: 1667508232}
+        m_TargetAssemblyTypeName: BankCL, Assembly-CSharp
+        m_MethodName: Load_config_app
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6646,10 +6643,6 @@ MonoBehaviour:
   txt_status_app: {fileID: 486109017}
   txt_btn_start: {fileID: 1230964717}
   img_icon_btn_start: {fileID: 207500251}
-  bank_items:
-  - {fileID: 1875572714007245714}
-  - {fileID: 1449397717}
-  - {fileID: 1909403699}
   sp_icon_start: {fileID: 21300000, guid: 443cdc4ae6c8a30479b118a6e35aadee, type: 3}
   sp_icon_stop: {fileID: 21300000, guid: 4bd87f00c1468be45b1a98b7695b371f, type: 3}
 --- !u!114 &1667508231
@@ -6681,6 +6674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   app: {fileID: 1667508230}
+  bank_items: []
 --- !u!114 &1667508233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7490,17 +7484,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7436165350352120368, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
   m_PrefabInstance: {fileID: 1909403697}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1909403699 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
-  m_PrefabInstance: {fileID: 1909403697}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1919801837
 GameObject:
   m_ObjectHideFlags: 0
@@ -8142,17 +8125,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
---- !u!114 &1875572714007245714 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2757613022657777841, guid: 26c39e9b949b67c4eaae783a4147d77a, type: 3}
-  m_PrefabInstance: {fileID: 1875572714007245713}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc56f4668ae7e6a4baccd40f25af40e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
