@@ -222,26 +222,30 @@ public class ADB_Control : MonoBehaviour
 
     private void ListConnectedDevices(UnityAction<List<string>> Act_done)
     {
-        string adbDevicesCommand = "adb devices";
-        this.RunADBCommand(adbDevicesCommand,output=>{
-            string[] lines = output.Split('\n');
+        if(this.is_memu){
+            this.RunCommandWithMemu("adb devices",output=>{
+                this.Load_list_devices(output,Act_done);
+            });
+        }else{
+            this.RunADBCommand("adb devices",output=>{
+                this.Load_list_devices(output,Act_done);
+            });
+        }
+    }
 
-            List<string> deviceList = new List<string>();
-            for (int i = 1; i < lines.Length; i++)
+    private void Load_list_devices(string output,UnityAction<List<string>> Act_done){
+        string[] lines = output.Split('\n');
+        List<string> deviceList = new();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (!string.IsNullOrEmpty(line) && line.Contains("device"))
             {
-                string line = lines[i].Trim();
-                if (!string.IsNullOrEmpty(line) && line.Contains("device"))
-                {
-                    string[] parts = line.Split('\t');
-                    if (parts.Length > 0)
-                    {
-                        deviceList.Add(parts[0]);
-                    }
-                }
+                string[] parts = line.Split('\t');
+                if (parts.Length > 0) deviceList.Add(parts[0]);
             }
-
-            Act_done?.Invoke(deviceList);
-        });
+        }
+        Act_done?.Invoke(deviceList);
     }
 
     public void Btn_show_list_devices(){
