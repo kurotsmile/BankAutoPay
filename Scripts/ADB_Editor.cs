@@ -83,12 +83,12 @@ public class ADB_Editor : MonoBehaviour
         this.Update_list_ui_Method_right_menu();
     }
 
-    private void Update_list_ui_Method_right_menu(){
+    public void Update_list_ui_Method_right_menu(){
         this.app.cr.clear_contain(this.app.tr_all_item_right);
         for(int i=0;i<=this.length_method;i++){
             var index=i;
             if(PlayerPrefs.GetString("m_"+i+"_name","")=="") continue;
-            
+
             string s_name=PlayerPrefs.GetString("m_"+i+"_name");
             Carrot_Box_Item item_m=this.app.Add_Item_Right(s_name,"Method",this.app.cr.icon_carrot_advanced);
             item_m.set_act(()=>{
@@ -561,5 +561,10 @@ public class ADB_Editor : MonoBehaviour
 
     public IList Get_list_Command(){
         return this.list_command;
+    }
+
+    public IList Get_list_command_method_cur(){
+        IList list_cmd=(IList) Json.Deserialize(PlayerPrefs.GetString("m_"+this.index_sel_method+"_data"));
+        return list_cmd;
     }
 }

@@ -25,6 +25,7 @@ public class ADB_List_task : MonoBehaviour
     public void On_Show(){
         this.panel_btn.SetActive(true);
         this.Update_ui_btn_play();
+        this.app.adb_editor.Update_list_ui_Method_right_menu();
     }
 
     public void Close_task_list(){
@@ -95,7 +96,7 @@ public class ADB_List_task : MonoBehaviour
         this.app.adb.On_Open_App(this.list_task[index]);
         this.Update_list_ui();
         this.app.txt_status_app.text="Play task:"+index+" "+this.list_task[index];
-        this.app.adb.On_Play(this.app.adb_editor.Get_list_Command(),()=>{
+        this.app.adb.On_Play(this.app.adb_editor.Get_list_command_method_cur(),()=>{
             this.app.adb.On_Stop_App(this.list_task[index]);
             this.On_Next_task();
         });
