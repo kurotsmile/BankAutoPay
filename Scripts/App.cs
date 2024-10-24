@@ -109,9 +109,10 @@ public class App : MonoBehaviour
         return box_item;
     }
 
-    public Carrot_Box_Item Add_Item_Right(string s_title,string s_tip,Sprite s_icon){
+    public Carrot_Box_Item Add_Item_Right(string s_title,string s_tip,Sprite s_icon,Transform tr_father=null){
+        if(tr_father==null) tr_father=this.tr_all_item_right;
         GameObject obj_item=Instantiate(this.item_box_prefab);
-        obj_item.transform.SetParent(this.tr_all_item_right);
+        obj_item.transform.SetParent(tr_father);
         obj_item.transform.localPosition=new Vector3(1f,1f,1f);
         obj_item.transform.localScale=new Vector3(1f,1f,1f);
 
@@ -123,5 +124,9 @@ public class App : MonoBehaviour
         item_box.GetComponent<Image>().color=this.color_colum_a;
         item_box.check_type();
         return item_box;
+    }
+
+    public void Btn_show_setting(){
+        this.cr.Create_Setting();
     }
 }

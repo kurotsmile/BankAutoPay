@@ -25,6 +25,7 @@ public class ADB_Editor : MonoBehaviour
     public Sprite sp_icon_send_text;
     public Sprite sp_icon_swipe;
     public Sprite sp_icon_stop_all;
+    public Sprite sp_icon_inster_after;
 
     private IList list_command;
 
@@ -48,32 +49,50 @@ public class ADB_Editor : MonoBehaviour
         this.panel_btn.SetActive(true);
     }
 
-    private void Load_Menu_Right(){
-        this.app.Add_Item_Right("Add Mouse click","Add position x,y click",this.sp_icon_mouse).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.mouse_click);
+    private void Load_Menu_Right(Transform tr_father=null,int index_insert=-1){
+        this.app.Add_Item_Right("Add Mouse click","Add position x,y click",this.sp_icon_mouse,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.mouse_click,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.mouse_click);
         });
 
-        this.app.Add_Item_Right("Open The App","Open the application with the package name",this.sp_icon_open_app).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.open_app);
+        this.app.Add_Item_Right("Open The App","Open the application with the package name",this.sp_icon_open_app,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.open_app,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.open_app);
         });
 
-        this.app.Add_Item_Right("Close The App","Close the application with the package name",this.sp_icon_close_app).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.close_app);
+        this.app.Add_Item_Right("Close The App","Close the application with the package name",this.sp_icon_close_app,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.close_app,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.close_app);
         });
 
-        this.app.Add_Item_Right("Waiting","waiting to continue other tasks",this.sp_icon_waiting).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.waiting);
+        this.app.Add_Item_Right("Waiting","waiting to continue other tasks",this.sp_icon_waiting,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.waiting,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.waiting);
         });
 
-        this.app.Add_Item_Right("Send Text","Send Text to Device as Clipboard",this.sp_icon_send_text).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
+        this.app.Add_Item_Right("Send Text","Send Text to Device as Clipboard",this.sp_icon_send_text,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.send_text,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.send_text);
         });
 
-        this.app.Add_Item_Right("Swipe","Slide the screen from one position to another",this.sp_icon_swipe).set_act(()=>{
-            this.Show_edit_control(-1,CONTROL_ADB_TYPE.swipe);
+        this.app.Add_Item_Right("Swipe","Slide the screen from one position to another",this.sp_icon_swipe,tr_father).set_act(()=>{
+            if(index_insert!=-1)
+                this.Show_edit_control(index_insert,CONTROL_ADB_TYPE.swipe,true);
+            else
+                this.Show_edit_control(-1,CONTROL_ADB_TYPE.swipe);
         });
 
-        this.app.Add_Item_Right("Stop all applications","Stop all user applications excluding system applications",this.sp_icon_stop_all).set_act(()=>{
+        this.app.Add_Item_Right("Stop all applications","Stop all user applications excluding system applications",this.sp_icon_stop_all,tr_father).set_act(()=>{
             this.Add_item_for_list(CONTROL_ADB_TYPE.close_all_app,"Stop all applications");
             this.Update_list_ui();
         });
@@ -227,6 +246,15 @@ public class ADB_Editor : MonoBehaviour
                     if(control_data["type"].ToString()=="swipe")  this.app.adb.On_Swipe(control_data["x1"].ToString(),control_data["y1"].ToString(),control_data["x2"].ToString(),control_data["y2"].ToString(),int.Parse(control_data["timer"].ToString()));
                 });
 
+                
+                Carrot_Box_Btn_Item btn_inster=cr_item.create_item();
+                btn_inster.set_icon_color(Color.white);
+                btn_inster.set_icon(this.sp_icon_inster_after);
+                btn_inster.set_color(app.cr.color_highlight);
+                btn_inster.set_act(()=>{
+                    this.Show_sub_menu(index);
+                });
+
                 if(control_data["type"].ToString()!="close_all_app"){
                     Carrot.Carrot_Box_Btn_Item btn_edit=cr_item.create_item();
                     btn_edit.set_icon_color(Color.white);
@@ -272,14 +300,19 @@ public class ADB_Editor : MonoBehaviour
         return inp_note;
     }
 
-    private void Show_edit_control(int index,CONTROL_ADB_TYPE type){
+    private void Show_edit_control(int index,CONTROL_ADB_TYPE type,bool is_insert=false){
         if(this.box!=null) this.box.close();
 
         IDictionary data_control=null;
-        if(index!=-1)
-            data_control=(IDictionary)this.list_command[index];
-        else
+        if(is_insert){
             data_control=(IDictionary) Json.Deserialize("{}");
+        }else{
+            if(index!=-1)
+                data_control=(IDictionary)this.list_command[index];
+            else
+                data_control=(IDictionary) Json.Deserialize("{}");
+        }
+
         data_control["type"]=type.ToString();
 
         this.box=this.app.cr.Create_Box("box_control_edit");
@@ -314,10 +347,15 @@ public class ADB_Editor : MonoBehaviour
                 data_control["x"]=inp_x.get_val();
                 data_control["y"]=inp_y.get_val();
                 data_control["tip"]=inp_tip.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
+
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -346,10 +384,14 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["id_app"]=inp_id_app.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -378,10 +420,14 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["id_app"]=inp_id_app.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -410,10 +456,14 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["timer"]=inp_timer.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -442,10 +492,15 @@ public class ADB_Editor : MonoBehaviour
             btn_done.set_icon_white(this.app.cr.icon_carrot_done);
             btn_done.set_act_click(()=>{
                 data_control["text"]=inp_text.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
+
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -504,10 +559,14 @@ public class ADB_Editor : MonoBehaviour
                 data_control["y2"]=inp_y2.get_val();
                 data_control["tip"]=inp_tip.get_val();
                 data_control["timer"]=inp_timer_ms.get_val();
-                if(index!=-1)
-                    this.list_command[index]=data_control;
-                else
-                    this.list_command.Add(data_control);
+                if(is_insert){
+                    this.list_command.Insert(index+1,data_control);
+                }else{
+                    if(index!=-1)
+                        this.list_command[index]=data_control;
+                    else
+                        this.list_command.Add(data_control);
+                }
                 this.box.close();
                 this.app.cr.play_sound_click();
                 this.Update_list_ui();
@@ -538,6 +597,13 @@ public class ADB_Editor : MonoBehaviour
             this.list_command= (IList) Carrot.Json.Deserialize(FileBrowserHelpers.ReadTextFromFile(s_path));
             this.Update_list_ui();
         });
+    }
+
+    public void Show_sub_menu(int index_insert){
+        this.box=this.app.cr.Create_Box();
+        this.box.set_icon(this.sp_icon_inster_after);
+        this.box.set_title("Insert next element after this element");
+        this.Load_Menu_Right(this.box.area_list_contain,index_insert);
     }
 
     public void Add_item_for_list(CONTROL_ADB_TYPE type,string s_tip="Control ADB"){

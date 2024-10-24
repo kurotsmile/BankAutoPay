@@ -42,25 +42,38 @@ public class ADB_List_task : MonoBehaviour
             string s_path=paths[0];
             string fileContent = FileBrowserHelpers.ReadTextFromFile(s_path);
             string[] lines = fileContent.Split('\n');
-            int count_line=0;
+
             this.list_task=new List<string>();
-            foreach (string line in lines)
-            {
-                var index=count_line;
-                this.list_task.Add(line);
-                Carrot_Box_Item box_item=this.app.Add_item_main();
-                box_item.set_title("App "+count_line);
-                box_item.txt_name.color=Color.white;
-                box_item.set_tip(line);
-                box_item.set_icon_white(this.app.cr.icon_carrot_app);
-                box_item.set_act(()=>{
-                    this.index_cur_task=index;
-                    this.app.txt_status_app.text="Select app index:"+index;
-                });
-                if(count_line%2==0) box_item.GetComponent<Image>().color=this.app.color_colum_a;
-                count_line++;
-            }
+            foreach (string line in lines) this.list_task.Add(line);
+            this.Update_list_task_ui();
         });
+    }
+
+    private void Update_list_task_ui(){
+        for(int i=0;i<this.list_task.Count;i++){
+            var index=i;
+                
+            Carrot_Box_Item box_item=this.app.Add_item_main();
+            box_item.set_title("App "+i);
+            box_item.txt_name.color=Color.white;
+            box_item.set_tip(this.list_task[i]);
+            box_item.set_icon_white(this.app.cr.icon_carrot_app);
+            box_item.set_act(()=>{
+                this.index_cur_task=index;
+                this.app.txt_status_app.text="Select app index:"+index;
+            });
+
+            Carrot_Box_Btn_Item btn_del=box_item.create_item();
+            btn_del.set_icon_color(Color.white);
+            btn_del.set_icon(app.cr.sp_icon_del_data);
+            btn_del.set_color(app.cr.color_highlight);
+            btn_del.set_act(()=>{
+                this.list_task.RemoveAt(index);
+                this.Update_list_task_ui();
+            });
+
+            if(i%2==0) box_item.GetComponent<Image>().color=this.app.color_colum_a;
+        }
     }
 
     public void On_Play(){
