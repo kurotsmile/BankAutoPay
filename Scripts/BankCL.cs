@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Firebase;
-using Firebase.Database;
-using Firebase.Extensions;
+//using Firebase;
+//using Firebase.Database;
+//using Firebase.Extensions;
 
 public class BankCL : MonoBehaviour
 {
@@ -14,8 +14,8 @@ public class BankCL : MonoBehaviour
     public Bank_Item[] bank_items;
     private int index_sel_bank;
 
-    private DatabaseReference databaseRef;
-    private FirebaseApp customApp;
+    //private DatabaseReference databaseRef;
+    //private FirebaseApp customApp;
 
 
     public void On_Load(){
@@ -25,6 +25,7 @@ public class BankCL : MonoBehaviour
     }
 
     public void Load_config_app(){
+        /*
         AppOptions options = new AppOptions
         {
             ApiKey = "AIzaSyBKQ51navOWhgLHY1flH7eK4hPuj9knOa0", 
@@ -54,6 +55,7 @@ public class BankCL : MonoBehaviour
         else{
             Debug.Log("App da duoc tao!");
         } 
+        */
     }
 
     private void Update_ui_list_bank(){
@@ -64,11 +66,11 @@ public class BankCL : MonoBehaviour
 
     void ReadDataFromFirebase()
     {
-        DatabaseReference usersRef = databaseRef.Child("lich_su_nap_rut");
-        usersRef.ValueChanged += HandleValueChanged;
+        //DatabaseReference usersRef = databaseRef.Child("lich_su_nap_rut");
+        //usersRef.ValueChanged += HandleValueChanged;
     }
 
-    
+    /*
     void HandleValueChanged(object sender, ValueChangedEventArgs args)
     {
         if (args.DatabaseError != null)
@@ -157,4 +159,5 @@ public class BankCL : MonoBehaviour
         this.Update_ui_list_bank();
         this.app.cr.play_sound_click();
     }
+    */
 }

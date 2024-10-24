@@ -41,8 +41,8 @@ public class ADB_Editor : MonoBehaviour
 
     public void Show_Editor(){
         this.list_command=(IList) Carrot.Json.Deserialize("[]");
-        this.app.Clear_contain(this.app.tr_all_item);
-        this.app.Clear_contain(this.app.tr_all_item_right);
+        this.app.cr.clear_contain(this.app.tr_all_item);
+        this.app.cr.clear_contain(this.app.tr_all_item_right);
         this.app.cr.play_sound_click();
         this.Load_Menu_Right();
         this.panel_btn.SetActive(true);
@@ -159,7 +159,7 @@ public class ADB_Editor : MonoBehaviour
     }
 
     public void Update_list_ui(){
-        this.app.Clear_contain(this.app.tr_all_item);
+        this.app.cr.clear_contain(this.app.tr_all_item);
         for(int i=0;i<this.list_command.Count;i++){
                 var index=i;
                 IDictionary control_data=(IDictionary) list_command[i];

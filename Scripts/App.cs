@@ -25,11 +25,16 @@ public class App : MonoBehaviour
     public Transform tr_all_item_right;
     public Text txt_status_app;
     public Text txt_btn_start;
+    public Text txt_btn_memu;
+    public Image img_icon_btn_memu;
     public Image img_icon_btn_start;
 
     [Header("Asset")]
     public Sprite sp_icon_start;
     public Sprite sp_icon_stop;
+    public Sprite sp_icon_start_simulador;
+    public Sprite sp_icon_stop_simulador;
+    private bool is_play_simulador=false;
 
     void Start()
     {
@@ -47,24 +52,26 @@ public class App : MonoBehaviour
     public void Quit_App()
     {
         this.cr.play_sound_click();
-        this.bankcl.OnDisable();
         this.cr.delay_function(2f,()=>{
             Application.Quit();
         });
     }
 
-    public void Clear_contain(Transform tr)
-    {
-        foreach(Transform child in tr)
-        {
-            Destroy(child.gameObject);
+    public void Btn_start_or_stop_Memu(){
+        this.cr.play_sound_click();
+        if(this.is_play_simulador){
+            this.txt_btn_memu.text="Play";
+            this.img_icon_btn_memu.sprite=this.sp_icon_start_simulador;
+            this.adb.RunCommandWithMemu("stop");
+            this.adb.is_memu=false;
+            this.is_play_simulador=false;
+        }else{
+            this.adb.is_memu=true;
+            this.txt_btn_memu.text="Stop";
+            this.img_icon_btn_memu.sprite=this.sp_icon_stop_simulador;
+            this.adb.RunCommandWithMemu("start");
+            this.is_play_simulador=true;
         }
-    }
-
-    public void Btn_start_Memu(){
-        this.adb.is_memu=true;
-        this.txt_status_app.text="Memu emulator launched";
-        this.adb.RunCommandWithMemu("start");
     }
 
     public void Btn_start_auto(){
@@ -78,12 +85,6 @@ public class App : MonoBehaviour
             this.txt_btn_start.text="Stop";
             this.img_icon_btn_start.sprite=this.sp_icon_stop;
         }
-        this.cr.play_sound_click();
-    }
-
-    public void Btn_stop_memu(){
-        this.adb.is_memu=false;
-        this.adb.RunCommandWithMemu("stop");
         this.cr.play_sound_click();
     }
 

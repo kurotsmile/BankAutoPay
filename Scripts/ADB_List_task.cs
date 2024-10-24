@@ -38,7 +38,7 @@ public class ADB_List_task : MonoBehaviour
         this.app.file.Set_filter(Carrot_File_Data.TextDocument);
         this.index_cur_task=0;
         this.app.file.Open_file(paths=>{
-            this.app.Clear_contain(this.app.tr_all_item);
+            this.app.cr.clear_contain(this.app.tr_all_item);
             string s_path=paths[0];
             string fileContent = FileBrowserHelpers.ReadTextFromFile(s_path);
             string[] lines = fileContent.Split('\n');
@@ -135,8 +135,9 @@ public class ADB_List_task : MonoBehaviour
             {
                 foreach (string line in this.list_task)
                 {
-                    writer.WriteLine(line);
+                    writer.Write(line+"\n");
                 }
+                this.app.cr.Show_msg("Save file succes!","Save File",Msg_Icon.Success);
             }
         }
         catch (System.IO.IOException e)
