@@ -17,6 +17,7 @@ public class ADB_List_task : MonoBehaviour
     private List<string> list_task;
     private int index_cur_task=0;
     private bool is_play=false;
+    private string s_data_task_temp=null;
 
     public void On_Load(){
         this.panel_btn.SetActive(false);
@@ -26,6 +27,10 @@ public class ADB_List_task : MonoBehaviour
         this.panel_btn.SetActive(true);
         this.Update_ui_btn_play();
         this.app.adb_editor.Update_list_ui_Method_right_menu();
+        if(PlayerPrefs.GetString("s_data_task_temp","")!=""){
+            this.s_data_task_temp= PlayerPrefs.GetString("s_data_task_temp");
+            this.Load_list_by_data(this.s_data_task_temp);
+        }
     }
 
     public void Close_task_list(){
@@ -41,12 +46,16 @@ public class ADB_List_task : MonoBehaviour
             this.app.cr.clear_contain(this.app.tr_all_item);
             string s_path=paths[0];
             string fileContent = FileBrowserHelpers.ReadTextFromFile(s_path);
-            string[] lines = fileContent.Split('\n');
-
-            this.list_task=new List<string>();
-            foreach (string line in lines) this.list_task.Add(line);
-            this.Update_list_task_ui();
+            this.Load_list_by_data(fileContent);
+            PlayerPrefs.SetString("s_data_task_temp",fileContent);
         });
+    }
+
+    private void Load_list_by_data(string s_data){
+        string[] lines = s_data.Split('\n');
+        this.list_task=new List<string>();
+        foreach (string line in lines) this.list_task.Add(line);
+        this.Update_list_task_ui();
     }
 
     private void Update_list_task_ui(){

@@ -32,10 +32,10 @@ public class ADB_Control : MonoBehaviour
 
     public void On_Play(IList list_cmd,UnityAction act_done=null){
         if(this.list_command==null||this.list_command.Count==0){
-            this.app.cr.Show_msg("No commands have been created yet!","ADB Control",Msg_Icon.Alert);
+            this.app.cr.Show_msg("ADB Control","No commands have been created yet!",Msg_Icon.Alert);
         }
         else if(this.list_id_devices==null||this.list_id_devices.Count==0){
-            this.app.cr.Show_msg("You have not plugged in a device to run, please select a device or emulator to continue this process!","No Devices",Msg_Icon.Alert);
+            this.app.cr.Show_msg("No Devices","You have not plugged in a device to run, please select a device or emulator to continue this process!",Msg_Icon.Alert);
         }
         else
         {

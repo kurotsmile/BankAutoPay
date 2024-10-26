@@ -38,6 +38,10 @@ public class ADB_Editor : MonoBehaviour
     public void On_Load(){
         this.panel_btn.SetActive(false);
         this.length_method=PlayerPrefs.GetInt("length_method",0);
+        if(PlayerPrefs.GetString("m_"+index_sel_method+"_data","")==""){
+            IList list_cmd= (IList) Carrot.Json.Deserialize(PlayerPrefs.GetString("m_"+index_sel_method+"_data"));
+            this.app.adb.Set_List_Command(list_cmd);
+        }
     }
 
     public void Show_Editor(){
